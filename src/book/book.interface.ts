@@ -1,15 +1,33 @@
-export interface Book {
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+
+@Entity()
+export class Book {
+  @PrimaryGeneratedColumn()
   id: string;
+
+  @Column()
   title: string;
+
+  @Column()
   author: string;
+
+  @Column()
   description: string;
+
+  @Column({ type: 'timestamp' })
   publicationDate: Date;
+
+  @Column({ type: 'numeric' })
   price: number;
+
+  @Column()
   category: string;
+
+  @Column()
   coverImageURL: string;
 }
 
-export class CreateBookDto {
+export interface CreateBookDto {
   readonly title: string;
   readonly author: string;
   readonly description: string;
@@ -19,7 +37,7 @@ export class CreateBookDto {
   readonly coverImageURL: string;
 }
 
-export class UpdateBookDto {
+export interface UpdateBookDto {
   readonly title?: string;
   readonly author?: string;
   readonly description?: string;

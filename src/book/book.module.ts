@@ -4,7 +4,7 @@ import { BookService } from './book.service';
 import { BookRepository } from './book.repository';
 import { BookResolver } from './book.resolver';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Book } from './book.entity';
+import { Book } from './book.interface';
 
 @Module({
   controllers: [BookController],

@@ -11,7 +11,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       driver: ApolloDriver
     }),
     TypeOrmModule.forRoot({
-      type: 'postgres', // тип базы данных
+      type: 'postgres',
       host: process.env.POSTGRES_HOST,
       port: +process.env.POSTGRES_PORT,
       username: process.env.POSTGRES_USER,

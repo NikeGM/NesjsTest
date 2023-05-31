@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { Book, CreateBookDto, UpdateBookDto } from './book.interface';
+import { CreateBookDto, UpdateBookDto, Book } from './book.interface';
 import { BookRepository } from './book.repository';
 
 @Injectable()
 export class BookService {
-  constructor(private readonly bookRepository: BookRepository) {}
+  constructor(private readonly bookRepository: BookRepository) {
+  }
 
   async findAll(): Promise<Book[]> {
     return this.bookRepository.findAll();

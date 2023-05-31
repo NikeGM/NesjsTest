@@ -1,7 +1,6 @@
 import { Resolver, Query, Args, Mutation } from '@nestjs/graphql';
-import { Book } from './book.entity';
 import { BookService } from './book.service';
-import { BookGraphQL, CreateBookDto, CreateBookGraphQL, UpdateBookDto, UpdateBookGraphQL } from './book.interface';
+import { Book, BookGraphQL, CreateBookDto, UpdateBookDto } from './book.interface';
 
 @Resolver(of => BookGraphQL)
 export class BookResolver {
@@ -18,12 +17,12 @@ export class BookResolver {
   }
 
   @Mutation(returns => BookGraphQL)
-  async create(@Args('input') input: CreateBookGraphQL): Promise<Book> {
+  async create(@Args('input') input: CreateBookDto): Promise<Book> {
     return this.bookService.create(input);
   }
 
   @Mutation(returns => BookGraphQL)
-  async update(@Args('id') id: string, @Args('input') input: UpdateBookGraphQL): Promise<Book> {
+  async update(@Args('id') id: string, @Args('input') input: UpdateBookDto): Promise<Book> {
     return this.bookService.update(id, input);
   }
 
