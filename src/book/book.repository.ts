@@ -1,48 +1,39 @@
 import { Injectable } from '@nestjs/common';
-import { Book, CreateBookDto, UpdateBookDto } from './book.interface';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Book } from './book.entity';
+import { CreateBookDto, UpdateBookDto } from './book.interface';
 
 @Injectable()
 export class BookRepository {
-  private readonly books: Book[] = [];
+  constructor(
+    @InjectRepository(Book)
+    private readonly bookRepository: Repository<Book>,
+  ) {}
 
-  findAll(): Book[] {
-    return this.books;
+  async findAll(): Promise<Book[]> {
+    return this.bookRepository.find();
   }
 
-  findById(id: string): Book {
-    return this.books.find(book => book.id === id);
+  async findById(id: string): Promise<Book> {
+    return this.bookRepository.findOne({ where: { id } });
   }
 
-  create(bookDto: CreateBookDto): Book {
-    const book: Book = {
-      id: this.generateUniqueId(),
-      ...bookDto,
-    };
-    this.books.push(book);
-    return book;
+  async create(bookDto: CreateBookDto): Promise<Book> {
+    const book = this.bookRepository.create(bookDto);
+    return this.bookRepository.save(book);
   }
 
-  update(id: string, bookDto: UpdateBookDto): Book {
-    const index = this.books.findIndex(book => book.id === id);
-    if (index >= 0) {
-      const updatedBook: Book = {
-        ...this.books[index],
-        ...bookDto,
-      };
-      this.books[index] = updatedBook;
-      return updatedBook;
+  async update(id: string, bookDto: UpdateBookDto): Promise<Book> {
+    const book = await this.bookRepository.findOne({ where: { id } });
+    if (book) {
+      const updatedBook = this.bookRepository.merge(book, bookDto);
+      return this.bookRepository.save(updatedBook);
     }
     return null;
   }
 
-  delete(id: string): void {
-    const index = this.books.findIndex(book => book.id === id);
-    if (index >= 0) {
-      this.books.splice(index, 1);
-    }
-  }
-
-  private generateUniqueId(): string {
-    return Date.now().toString();
+  async delete(id: string): Promise<void> {
+    await this.bookRepository.delete(id);
   }
 }
