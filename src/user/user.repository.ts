@@ -7,15 +7,16 @@ import { CreateUserDto, UpdateUserDto, User } from './user.interface';
 export class UserRepository {
   constructor(
     @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
-  ) {}
+    private readonly userRepository: Repository<User>
+  ) {
+  }
 
   async findAll(): Promise<User[]> {
     return this.userRepository.find();
   }
 
   async findById(id: number): Promise<User> {
-    return this.userRepository.findOne({ where: { id }});
+    return this.userRepository.findOne({ where: { id } });
   }
 
   async create(userDto: CreateUserDto): Promise<User> {
@@ -24,7 +25,7 @@ export class UserRepository {
   }
 
   async update(id: number, userDto: UpdateUserDto): Promise<User> {
-    const user = await this.userRepository.findOne({ where: { id }});
+    const user = await this.userRepository.findOne({ where: { id } });
     if (user) {
       const updatedUser = this.userRepository.merge(user, userDto);
       return this.userRepository.save(updatedUser);

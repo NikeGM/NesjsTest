@@ -1,6 +1,12 @@
 import { Field, InputType, Int, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
+export enum UserRole {
+  USER = 'USER',
+  MANAGER = 'MANAGER',
+  ADMIN = 'ADMIN',
+}
+
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
@@ -12,17 +18,22 @@ export class User {
   @Column()
   nickname: string;
 
-  @Column()
-  role: string;
+  @Column({
+    type: 'enum',
+    enum: UserRole,
+    default: UserRole.USER
+  })
+  role: UserRole;
 
   @Column()
   passwordHash: string;
+
 }
 
 export interface CreateUserDto {
   readonly balance: number;
   readonly nickname: string;
-  readonly role: string;
+  readonly role: UserRole;
   readonly password: string;
 }
 
@@ -30,7 +41,7 @@ export interface UpdateUserDto {
   id: number;
   readonly balance?: number;
   readonly nickname?: string;
-  readonly role?: string;
+  readonly role?: UserRole;
 }
 
 
@@ -38,7 +49,7 @@ export interface UserDto {
   readonly id: number;
   readonly balance?: number;
   readonly nickname?: string;
-  readonly role?: string;
+  readonly role?: UserRole;
 }
 
 @ObjectType()

@@ -6,6 +6,7 @@ import { User } from './user.interface';
 @Module({
   imports: [TypeOrmModule.forFeature([User])],
   providers: [UserRepository],
-  exports: [UserRepository],
+  exports: [UserRepository]
 })
-export class UserModule {}
+export class UserModule {
+}

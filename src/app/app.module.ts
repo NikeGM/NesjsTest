@@ -20,11 +20,12 @@ import { UserModule } from '../user/user.module';
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DB,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true,
+      synchronize: true
     }),
     BookModule,
     AuthModule,
     UserModule
-  ],
+  ]
 })
-export class AppModule {}
+export class AppModule {
+}

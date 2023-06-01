@@ -6,12 +6,13 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 @Resolver('Auth')
 export class AuthResolver {
   constructor(
-    private readonly authService: AuthService,
-  ) {}
+    private readonly authService: AuthService
+  ) {
+  }
 
   @Mutation(() => LoginResultGraphQL)
   async login(
-    @Args('input') userLoginInput: UserLoginInput,
+    @Args('input') userLoginInput: UserLoginInput
   ): Promise<LoginResultGraphQL> {
     const user = await this.authService.validateUser(userLoginInput);
 

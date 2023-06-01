@@ -5,7 +5,8 @@ import { AuthGuard } from '@nestjs/passport';
 
 @Controller('books')
 export class BookController {
-  constructor(private readonly bookService: BookService) {}
+  constructor(private readonly bookService: BookService) {
+  }
 
   @Get()
   async findAll(): Promise<Book[]> {

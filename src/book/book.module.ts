@@ -10,7 +10,8 @@ import { Book } from './book.interface';
   controllers: [BookController],
   providers: [BookService, BookRepository, BookResolver],
   imports: [
-    TypeOrmModule.forFeature([Book]),
+    TypeOrmModule.forFeature([Book])
   ]
 })
-export class BookModule {}
+export class BookModule {
+}

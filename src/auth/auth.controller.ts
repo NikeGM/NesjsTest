@@ -4,7 +4,8 @@ import { UserLoginData, LoginResult } from './auth.interface';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) {
+  }
 
   @Post('login')
   async login(@Body() loginUserDto: UserLoginData, @Req() req): Promise<LoginResult> {
