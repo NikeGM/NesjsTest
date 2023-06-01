@@ -19,19 +19,19 @@ export class BookController {
   }
 
   @Post()
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard())
   async create(@Body() book: CreateBookDto): Promise<Book> {
     return await this.bookService.create(book);
   }
 
   @Put(':id')
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard())
   async update(@Param('id') id: string, @Body() book: UpdateBookDto): Promise<Book> {
     return await this.bookService.update(id, book);
   }
 
   @Delete(':id')
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard())
   async delete(@Param('id') id: string): Promise<void> {
     await this.bookService.delete(id);
   }

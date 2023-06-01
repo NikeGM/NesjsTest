@@ -1,25 +1,25 @@
-import { Resolver, Mutation, Args } from '@nestjs/graphql';
+import { Args, Mutation, Resolver } from '@nestjs/graphql';
 import { AuthService } from './auth.service';
-import { LoginResultGraphQL, UserLoginData, UserLoginInput } from './auth.interface';
-import { HttpException, HttpStatus } from '@nestjs/common';
+import { UserService } from '../user/user.service';
+import { LoginResultGraphQL, UserLoginInput } from './auth.interface';
 
-@Resolver('Auth')
+@Resolver()
 export class AuthResolver {
   constructor(
-    private readonly authService: AuthService
+    private authService: AuthService,
+    private userService: UserService
   ) {
   }
 
   @Mutation(() => LoginResultGraphQL)
-  async login(
-    @Args('input') userLoginInput: UserLoginInput
-  ): Promise<LoginResultGraphQL> {
-    const user = await this.authService.validateUser(userLoginInput);
+  async login(@Args('input') userLoginData: UserLoginInput): Promise<LoginResultGraphQL> {
+    const result = await this.userService.validateUser(userLoginData);
 
-    if (!user) {
-      throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
+    if (!result) {
+      throw new Error('Invalid credentials');
     }
 
-    return this.authService.login(user);
+    return this.authService.login(result);
+
   }
 }

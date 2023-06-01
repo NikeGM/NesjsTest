@@ -1,20 +1,14 @@
-import { Controller, Post, Body, Req, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { UserLoginData, LoginResult } from './auth.interface';
+import { UserLoginData } from './auth.interface';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {
-  }
+  constructor(private readonly authService: AuthService) {}
 
   @Post('login')
-  async login(@Body() loginUserDto: UserLoginData, @Req() req): Promise<LoginResult> {
-    const user = await this.authService.validateUser(loginUserDto);
-
-    if (!user) {
-      throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
-    }
-
-    return this.authService.login(user);
+  async login(@Body() userLoginData: UserLoginData) {
+    return this.authService.login(userLoginData);
   }
+
 }

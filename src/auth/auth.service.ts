@@ -1,30 +1,27 @@
 import { Injectable } from '@nestjs/common';
-import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
-import { UserLoginData, JwtPayload, LoginResult } from './auth.interface';
-import { User } from '../user/user.interface';
+import { JwtPayload, UserLoginData } from './auth.interface';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private userService: UserService,
-    private jwtService: JwtService
-  ) {
-  }
+    private readonly usersService: UserService,
+    private readonly jwtService: JwtService,
+  ) {}
 
-  async validateUser(loginData: UserLoginData): Promise<User | null> {
-    const user = await this.userService.findByNickname(loginData.nickname);
-    if (user && await bcrypt.compare(loginData.password, user.passwordHash)) {
-      return user;
+  async login(userLoginData: UserLoginData) {
+    const user = await this.usersService.validateUser(userLoginData);
+    if (!user) {
+      return null;
     }
-    return null;
-  }
 
-  async login(user: User): Promise<LoginResult> {
     const payload: JwtPayload = { id: user.id };
+    const accessToken = this.jwtService.sign(payload);
+
     return {
-      accessToken: this.jwtService.sign(payload)
+      expiresIn: 3600,
+      accessToken,
     };
   }
 }

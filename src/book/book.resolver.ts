@@ -20,19 +20,19 @@ export class BookResolver {
   }
 
   @Mutation(returns => BookGraphQL)
-  @UseGuards(AuthGuard)
+    @UseGuards(AuthGuard())
   async create(@Args('input') input: CreateBookDto): Promise<Book> {
     return this.bookService.create(input);
   }
 
   @Mutation(returns => BookGraphQL)
-  @UseGuards(AuthGuard)
+    @UseGuards(AuthGuard())
   async update(@Args('id') id: string, @Args('input') input: UpdateBookDto): Promise<Book> {
     return this.bookService.update(id, input);
   }
 
   @Mutation(returns => Boolean)
-  @UseGuards(AuthGuard)
+    @UseGuards(AuthGuard())
   async delete(@Args('id') id: string): Promise<boolean> {
     await this.bookService.delete(id);
     return true;

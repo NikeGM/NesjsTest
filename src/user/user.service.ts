@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto, UpdateUserDto, User } from './user.interface';
+import bcrypt from 'bcrypt'
+import { UserLoginData } from '../auth/auth.interface';
 
 @Injectable()
 export class UserService {
@@ -48,5 +50,25 @@ export class UserService {
   async delete(id: number): Promise<boolean> {
     const result = await this.userRepository.delete(id);
     return result.affected > 0;
+  }
+
+  async validateUser(userLoginData: UserLoginData): Promise<User> {
+    const { nickname, passwordHash } = userLoginData;
+
+    const user = await this.findByNickname(nickname);
+
+    if (!user) {
+      // Никнейм пользователя не найден
+      throw new Error('Invalid credentials');
+    }
+
+    const isPasswordMatching = await bcrypt.compare(passwordHash, user.passwordHash);
+
+    if (!isPasswordMatching) {
+      // Пароль не соответствует
+      throw new Error('Invalid credentials');
+    }
+
+    return user;
   }
 }
