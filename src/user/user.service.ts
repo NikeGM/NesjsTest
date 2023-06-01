@@ -1,10 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CreateUserGraphQL, UpdateUserGraphQL, User } from './user.interface';
+import { CreateUserDto, UpdateUserDto, User } from './user.interface';
 
 @Injectable()
 export class UserService {
+  private bcrypt: any;
+
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>
@@ -19,13 +21,23 @@ export class UserService {
     return this.userRepository.findOne({ where: { id } });
   }
 
-  async create(input: CreateUserGraphQL): Promise<User> {
-    const user = this.userRepository.create(input);
-    return this.userRepository.save(user);
+  async findByNickname(nickname: string): Promise<User> {
+    return this.userRepository.findOne({ where: { nickname } });
   }
 
-  async update(id: number, input: UpdateUserGraphQL): Promise<User> {
+  async create(input: CreateUserDto): Promise<User> {
+    const hashedPassword = await this.bcrypt.hash(input.password, 10);
+    const newUser = this.userRepository.create({
+      ...input,
+      passwordHash: hashedPassword
+    });
+
+    return this.userRepository.save(newUser);
+  }
+
+  async update(id: number, input: UpdateUserDto): Promise<User> {
     const user = await this.userRepository.findOne({ where: { id } });
+
     if (user) {
       const updatedUser = this.userRepository.merge(user, input);
       return this.userRepository.save(updatedUser);

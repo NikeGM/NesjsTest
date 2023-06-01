@@ -23,7 +23,7 @@ export interface CreateUserDto {
   readonly balance: number;
   readonly nickname: string;
   readonly role: string;
-  readonly passwordHash: string;
+  readonly password: string;
 }
 
 export interface UpdateUserDto {
@@ -31,9 +31,15 @@ export interface UpdateUserDto {
   readonly balance?: number;
   readonly nickname?: string;
   readonly role?: string;
-  readonly passwordHash?: string;
 }
 
+
+export interface UserDto {
+  readonly id: number;
+  readonly balance?: number;
+  readonly nickname?: string;
+  readonly role?: string;
+}
 
 @ObjectType()
 export class UserGraphQL {
@@ -68,9 +74,6 @@ export class CreateUserGraphQL {
 
   @Field()
   role: string;
-
-  @Field()
-  passwordHash: string;
 }
 
 @InputType()
@@ -83,10 +86,4 @@ export class UpdateUserGraphQL {
 
   @Field({ nullable: true })
   nickname?: string;
-
-  @Field({ nullable: true })
-  role?: string;
-
-  @Field({ nullable: true })
-  passwordHash?: string;
 }

@@ -3,6 +3,8 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { BookModule } from '../book/book.module';
 import { ApolloDriver } from '@nestjs/apollo';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthModule } from '../auth/auth.module';
+import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [
@@ -20,7 +22,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
     }),
-    BookModule
+    BookModule,
+    AuthModule,
+    UserModule
   ],
 })
 export class AppModule {}
