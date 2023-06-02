@@ -1,5 +1,7 @@
 import { Field, InputType, Int, ObjectType } from '@nestjs/graphql';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { UserBook } from './user-book.entity';
+import { Transaction } from './transaction.entity';
 
 export enum UserRole {
   USER = 'USER',
@@ -16,7 +18,7 @@ export class User {
   balance: number;
 
   @Column()
-  nickname: string;
+  username: string;
 
   @Column({
     type: 'enum',
@@ -28,11 +30,23 @@ export class User {
   @Column()
   passwordHash: string;
 
+  @OneToMany(() => UserBook, (userBook) => userBook.user)
+  userBooks: UserBook[];
+
+  @OneToMany(() => Transaction, (transaction) => transaction.user)
+  transactions: Transaction[];
+
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }
 
 export interface CreateUserDto {
   readonly balance: number;
-  readonly nickname: string;
+  readonly username: string;
   readonly role: UserRole;
   readonly password: string;
 }
@@ -40,7 +54,7 @@ export interface CreateUserDto {
 export interface UpdateUserDto {
   id: number;
   readonly balance?: number;
-  readonly nickname?: string;
+  readonly username?: string;
   readonly role?: UserRole;
 }
 
@@ -48,7 +62,7 @@ export interface UpdateUserDto {
 export interface UserDto {
   readonly id: number;
   readonly balance?: number;
-  readonly nickname?: string;
+  readonly username?: string;
   readonly role?: UserRole;
 }
 
@@ -64,7 +78,7 @@ export class UserGraphQL {
 
   @Field()
   @Column()
-  nickname: string;
+  username: string;
 
   @Field()
   @Column()
@@ -81,7 +95,7 @@ export class CreateUserGraphQL {
   balance: number;
 
   @Field()
-  nickname: string;
+  username: string;
 
   @Field()
   role: string;
@@ -96,5 +110,5 @@ export class UpdateUserGraphQL {
   balance?: number;
 
   @Field({ nullable: true })
-  nickname?: string;
+  username?: string;
 }

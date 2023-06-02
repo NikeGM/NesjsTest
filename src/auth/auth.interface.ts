@@ -1,7 +1,7 @@
 import { InputType, Field, ObjectType } from '@nestjs/graphql';
 
 export interface UserLoginData {
-  nickname: string;
+  username: string;
   passwordHash: string;
 }
 
@@ -17,7 +17,7 @@ export interface LoginResult {
 @InputType()
 export class UserLoginInputGraphQL {
   @Field()
-  nickname: string;
+  username: string;
 
   @Field()
   passwordHash: string;
@@ -34,7 +34,7 @@ export class LoginResultGraphQL {
 @InputType()
 export class UserLoginInput {
   @Field()
-  nickname: string;
+  username: string;
 
   @Field()
   passwordHash: string;

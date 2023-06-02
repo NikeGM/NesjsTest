@@ -15,7 +15,7 @@ export class BookRepository {
     return this.bookRepository.find();
   }
 
-  async findById(id: string): Promise<Book> {
+  async findById(id: number): Promise<Book> {
     return this.bookRepository.findOne({ where: { id } });
   }
 
@@ -24,7 +24,7 @@ export class BookRepository {
     return this.bookRepository.save(book);
   }
 
-  async update(id: string, bookDto: UpdateBookDto): Promise<Book> {
+  async update(id: number, bookDto: UpdateBookDto): Promise<Book> {
     const book = await this.bookRepository.findOne({ where: { id } });
     if (book) {
       const updatedBook = this.bookRepository.merge(book, bookDto);
@@ -33,7 +33,7 @@ export class BookRepository {
     return null;
   }
 
-  async delete(id: string): Promise<void> {
+  async delete(id: number): Promise<void> {
     await this.bookRepository.delete(id);
   }
 }

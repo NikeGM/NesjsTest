@@ -11,7 +11,7 @@ export class BookService {
     return this.bookRepository.findAll();
   }
 
-  async findById(id: string): Promise<Book> {
+  async findById(id: number): Promise<Book> {
     return this.bookRepository.findById(id);
   }
 
@@ -19,11 +19,11 @@ export class BookService {
     return this.bookRepository.create(book);
   }
 
-  async update(id: string, book: UpdateBookDto): Promise<Book> {
+  async update(id: number, book: UpdateBookDto): Promise<Book> {
     return this.bookRepository.update(id, book);
   }
 
-  async delete(id: string): Promise<void> {
+  async delete(id: number): Promise<void> {
     return this.bookRepository.delete(id);
   }
 }
