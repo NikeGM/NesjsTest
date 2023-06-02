@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { CreateBookDto, UpdateBookDto, Book } from './book.interface';
+import { CreateBookDto, UpdateBookDto } from './book.interface';
 import { BookRepository } from './book.repository';
+import { Book } from './entity/book.entity';
 
 @Injectable()
 export class BookService {
@@ -11,19 +12,19 @@ export class BookService {
     return this.bookRepository.findAll();
   }
 
-  async findById(id: number): Promise<Book> {
-    return this.bookRepository.findById(id);
+  async findById(bookId: number): Promise<Book> {
+    return this.bookRepository.findById(bookId);
   }
 
   async create(book: CreateBookDto): Promise<Book> {
     return this.bookRepository.create(book);
   }
 
-  async update(id: number, book: UpdateBookDto): Promise<Book> {
-    return this.bookRepository.update(id, book);
+  async update(bookId: number, book: UpdateBookDto): Promise<Book> {
+    return this.bookRepository.update(bookId, book);
   }
 
-  async delete(id: number): Promise<void> {
-    return this.bookRepository.delete(id);
+  async delete(bookId: number): Promise<void> {
+    return this.bookRepository.delete(bookId);
   }
 }

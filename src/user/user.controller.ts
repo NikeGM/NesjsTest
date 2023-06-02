@@ -1,10 +1,11 @@
 import { Controller, Get, Post, Put, Delete, Param, Body, UseGuards, Req } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto, UpdateUserDto, User, UserDto, UserRole } from './user.interface';
+import { CreateUserDto, UpdateUserDto, UserDto, UserRole } from './user.interface';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../role/role.guard';
 import { Roles } from '../role/role.decorator';
 import { UserAccessGuard } from './user-access.guard';
+import { User } from './entity/user.entity';
 
 @Controller('users')
 export class UserController {
@@ -19,11 +20,11 @@ export class UserController {
     return users.map(this.userToDtoFormat);
   }
 
-  @Get(':id')
+  @Get(':userId')
   @UseGuards(AuthGuard(), UserAccessGuard)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  async findOne(@Param('id') id: number): Promise<UserDto> {
-    const user = await this.userService.findById(id);
+  async findOne(@Param('userId') userId: number): Promise<UserDto> {
+    const user = await this.userService.findById(userId);
     return this.userToDtoFormat(user);
   }
 
@@ -33,31 +34,31 @@ export class UserController {
     return this.userToDtoFormat(user);
   }
 
-  @Put(':id')
+  @Put(':userId')
   @UseGuards(AuthGuard(), RolesGuard)
   @Roles(UserRole.ADMIN)
-  async update(@Param('id') id: number, @Body() input: UpdateUserDto): Promise<UserDto> {
-    const user = await this.userService.update(id, input);
+  async update(@Param('userId') userId: number, @Body() input: UpdateUserDto): Promise<UserDto> {
+    const user = await this.userService.update(userId, input);
     return this.userToDtoFormat(user);
   }
 
-  @Delete(':id')
+  @Delete(':userId')
   @UseGuards(AuthGuard(), RolesGuard)
   @Roles(UserRole.ADMIN)
-  async delete(@Param('id') id: number): Promise<boolean> {
-    return this.userService.delete(id);
+  async delete(@Param('userId') userId: number): Promise<boolean> {
+    return this.userService.delete(userId);
   }
 
   @Post('/buy')
   @UseGuards(AuthGuard())
   async buy(@Req() req, @Body('bookId') bookId: number) {
-    return this.userService.buy(req.user.id, bookId);
+    return this.userService.buy(req.user.userId, bookId);
   }
 
   private userToDtoFormat(user: User): UserDto {
     return {
       balance: user.balance,
-      id: user.id,
+      userId: user.userId,
       role: user.role
     };
   }

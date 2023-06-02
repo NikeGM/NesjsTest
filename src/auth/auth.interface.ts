@@ -6,7 +6,7 @@ export interface UserLoginData {
 }
 
 export interface JwtPayload {
-  id: number;
+  userId: number;
 }
 
 export interface LoginResult {

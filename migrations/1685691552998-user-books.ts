@@ -4,12 +4,13 @@ import {
   Table,
   TableForeignKey
 } from 'typeorm';
+import { DbTables } from '../src/types';
 
 export class CreateUserBooksTable1685691552998 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'userBooks',
+        name: DbTables.USER_BOOKS,
         columns: [
           {
             name: 'id',
@@ -37,27 +38,27 @@ export class CreateUserBooksTable1685691552998 implements MigrationInterface {
     );
 
     await queryRunner.createForeignKey(
-      'userBooks',
+      DbTables.USER_BOOKS,
       new TableForeignKey({
         columnNames: ['userId'],
-        referencedColumnNames: ['id'],
-        referencedTableName: 'users',
+        referencedColumnNames: ['userId'],
+        referencedTableName: DbTables.USERS,
         onDelete: 'CASCADE'
       })
     );
 
     await queryRunner.createForeignKey(
-      'userBooks',
+      DbTables.USER_BOOKS,
       new TableForeignKey({
         columnNames: ['bookId'],
-        referencedColumnNames: ['id'],
-        referencedTableName: 'books',
+        referencedColumnNames: ['bookId'],
+        referencedTableName: DbTables.BOOKS,
         onDelete: 'CASCADE'
       })
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable('userBooks');
+    await queryRunner.dropTable(DbTables.USER_BOOKS);
   }
 }

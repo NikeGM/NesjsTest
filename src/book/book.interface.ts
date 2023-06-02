@@ -1,38 +1,3 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
-
-@Entity()
-export class Book {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Column()
-  title: string;
-
-  @Column()
-  author: string;
-
-  @Column()
-  description: string;
-
-  @Column({ type: 'timestamp' })
-  publicationDate: Date;
-
-  @Column({ type: 'numeric' })
-  price: number;
-
-  @Column()
-  category: string;
-
-  @Column()
-  coverImageURL: string;
-
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
-}
-
 export interface CreateBookDto {
   readonly title: string;
   readonly author: string;
@@ -58,7 +23,7 @@ import { Field, Float, ID, InputType, ObjectType } from '@nestjs/graphql';
 @ObjectType()
 export class BookGraphQL {
   @Field(type => ID)
-  id: string;
+  bookId: number;
 
   @Field()
   title: string;

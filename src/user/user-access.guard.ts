@@ -14,7 +14,7 @@ export class UserAccessGuard implements CanActivate {
 
     const isManager = user.role === UserRole.MANAGER || user.role == UserRole.ADMIN;
 
-    return isManager || user.id === params.id;
+    return isManager || user.userId === params.userId;
   }
 }
 
@@ -27,6 +27,6 @@ export class UserAccessGraphQlGuard implements CanActivate {
     const user = ctx.getContext().req.user;
     const params = ctx.getArgs();
 
-    return user.role === UserRole.MANAGER || user.id === params.id;
+    return user.role === UserRole.MANAGER || user.userId === params.userId;
   }
 }

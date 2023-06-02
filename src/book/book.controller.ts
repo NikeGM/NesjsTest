@@ -1,10 +1,11 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
-import { Book, CreateBookDto, UpdateBookDto } from './book.interface';
+import { CreateBookDto, UpdateBookDto } from './book.interface';
 import { BookService } from './book.service';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../role/role.guard';
 import { Roles } from '../role/role.decorator';
 import { UserRole } from '../user/user.interface';
+import { Book } from './entity/book.entity';
 
 @Controller('books')
 export class BookController {
@@ -16,9 +17,9 @@ export class BookController {
     return await this.bookService.findAll();
   }
 
-  @Get(':id')
-  async findOne(@Param('id') id: string): Promise<Book> {
-    return await this.bookService.findById(id);
+  @Get(':bookId')
+  async findOne(@Param('bookId') bookId: number): Promise<Book> {
+    return await this.bookService.findById(bookId);
   }
 
   @Post()
@@ -28,17 +29,17 @@ export class BookController {
     return await this.bookService.create(book);
   }
 
-  @Put(':id')
+  @Put(':bookId')
   @UseGuards(AuthGuard(), RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  async update(@Param('id') id: string, @Body() book: UpdateBookDto): Promise<Book> {
-    return await this.bookService.update(id, book);
+  async update(@Param('bookId') bookId: number, @Body() book: UpdateBookDto): Promise<Book> {
+    return await this.bookService.update(bookId, book);
   }
 
-  @Delete(':id')
+  @Delete(':bookId')
   @UseGuards(AuthGuard(), RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  async delete(@Param('id') id: string): Promise<void> {
-    await this.bookService.delete(id);
+  async delete(@Param('bookId') bookId: number): Promise<void> {
+    await this.bookService.delete(bookId);
   }
 }

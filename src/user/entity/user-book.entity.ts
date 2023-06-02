@@ -3,13 +3,13 @@ import {
   Column,
   PrimaryGeneratedColumn,
   ManyToOne,
-  JoinColumn,
   CreateDateColumn,
 } from 'typeorm';
-import { User } from './user.interface';
-import { Book } from '../book/book.interface';
+import { User } from './user.entity';
+import { Book } from '../../book/entity/book.entity';
+import { DbTables } from '../../types';
 
-@Entity('user_books')
+@Entity(DbTables.USER_BOOKS)
 export class UserBook {
   @PrimaryGeneratedColumn()
   id: number;

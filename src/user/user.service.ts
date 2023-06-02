@@ -1,13 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CreateUserDto, UpdateUserDto, User } from './user.interface';
+import { CreateUserDto, UpdateUserDto } from './user.interface';
 import bcrypt from 'bcrypt';
 import { UserLoginData } from '../auth/auth.interface';
-import { Book } from '../book/book.interface';
-import { UserBook } from './user-book.entity';
-import { Transaction, TransactionAction } from './transaction.entity';
 import { BookService } from '../book/book.service';
+import { User } from './entity/user.entity';
+import { Book } from '../book/entity/book.entity';
+import { UserBook } from './entity/user-book.entity';
+import { Transaction, TransactionAction } from './entity/transaction.entity';
 
 @Injectable()
 export class UserService {
@@ -45,7 +46,7 @@ export class UserService {
 
       const transaction = this.transactionRepository.create({
         user,
-        bookId: book.id,
+        bookId: book.bookId,
         action: TransactionAction.BUY,
         amount: book.price,
         createdAt: new Date(),
@@ -53,8 +54,8 @@ export class UserService {
       await manager.save(transaction);
 
       const userBook = this.userBookRepository.create({
-        userId: user.id,
-        bookId: book.id,
+        userId: user.userId,
+        bookId: book.bookId,
         createdAt: new Date(),
       });
       await manager.save(userBook);
@@ -65,8 +66,8 @@ export class UserService {
     return this.userRepository.find();
   }
 
-  async findById(id: number): Promise<User> {
-    return this.userRepository.findOne({ where: { id } });
+  async findById(userId: number): Promise<User> {
+    return this.userRepository.findOne({ where: { userId } });
   }
 
   async findByUsername(username: string): Promise<User> {
@@ -83,8 +84,8 @@ export class UserService {
     return this.userRepository.save(newUser);
   }
 
-  async update(id: number, input: UpdateUserDto): Promise<User> {
-    const user = await this.userRepository.findOne({ where: { id } });
+  async update(userId: number, input: UpdateUserDto): Promise<User> {
+    const user = await this.userRepository.findOne({ where: { userId } });
 
     if (user) {
       const updatedUser = this.userRepository.merge(user, input);
@@ -93,8 +94,8 @@ export class UserService {
     return null;
   }
 
-  async delete(id: number): Promise<boolean> {
-    const result = await this.userRepository.delete(id);
+  async delete(userId: number): Promise<boolean> {
+    const result = await this.userRepository.delete(userId);
     return result.affected > 0;
   }
 

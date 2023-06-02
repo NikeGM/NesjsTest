@@ -2,16 +2,18 @@ import { MigrationInterface, QueryRunner, Table } from 'typeorm';
 import { UserRole } from '../src/user/user.interface';
 import bcrypt from 'bcrypt';
 import { config } from 'dotenv';
+import { DbTables } from '../src/types';
+import { User } from '../src/user/entity/user.entity';
 
 config();
 
 export class CreateUserTable1685621583345 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(new Table({
-      name: 'user',
+      name: DbTables.USERS,
       columns: [
         {
-          name: 'id',
+          name: 'userId',
           type: 'int',
           isPrimary: true,
           isGenerated: true,
@@ -44,22 +46,31 @@ export class CreateUserTable1685621583345 implements MigrationInterface {
           name: 'updatedAt',
           type: 'timestamp',
           default: 'now()'
-        },
-        {
-          name: 'amount',
-          type: 'decimal'
         }
       ]
     }), true);
 
     const adminPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD, 10);
     const managerPassword = await bcrypt.hash(process.env.MANAGER_PASSWORD, 10);
-    await queryRunner.query(`INSERT INTO user (username, balance, role, passwordHash) VALUES ('admin', 1000, 'ADMIN', '${adminPassword}')`);
-    await queryRunner.query(`INSERT INTO user (username, balance, role, passwordHash) VALUES ('manager', 1000, 'MANAGER', '${managerPassword}')`);
+
+    const admin = new User();
+    admin.username = 'admin'
+    admin.balance = 1000
+    admin.role = UserRole.ADMIN
+    admin.passwordHash = adminPassword
+    await queryRunner.manager.save(admin);
+
+    const manager = new User();
+    manager.username = 'manager'
+    manager.balance = 1000
+    manager.role = UserRole.MANAGER
+    manager.passwordHash = managerPassword
+    await queryRunner.manager.save(admin);
+
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable('user');
+    await queryRunner.dropTable(DbTables.USERS);
   }
 
 }

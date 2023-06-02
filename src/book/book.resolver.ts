@@ -1,11 +1,12 @@
 import { Resolver, Query, Args, Mutation } from '@nestjs/graphql';
 import { BookService } from './book.service';
-import { Book, BookGraphQL, CreateBookDto, UpdateBookDto } from './book.interface';
+import { BookGraphQL, CreateBookDto, UpdateBookDto } from './book.interface';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../role/role.guard';
 import { Roles } from '../role/role.decorator';
 import { UserRole } from '../user/user.interface';
+import { Book } from './entity/book.entity';
 
 @Resolver(of => BookGraphQL)
 export class BookResolver {
@@ -18,8 +19,8 @@ export class BookResolver {
   }
 
   @Query(returns => BookGraphQL, { nullable: true })
-  async findOne(@Args('id') id: string): Promise<Book> {
-    return this.bookService.findById(id);
+  async findOne(@Args('bookId') bookId: number): Promise<Book> {
+    return this.bookService.findById(bookId);
   }
 
   @Mutation(returns => BookGraphQL)
@@ -32,15 +33,15 @@ export class BookResolver {
   @Mutation(returns => BookGraphQL)
   @UseGuards(AuthGuard(), RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  async update(@Args('id') id: string, @Args('input') input: UpdateBookDto): Promise<Book> {
-    return this.bookService.update(id, input);
+  async update(@Args('bookId') bookId: number, @Args('input') input: UpdateBookDto): Promise<Book> {
+    return this.bookService.update(bookId, input);
   }
 
   @Mutation(returns => Boolean)
   @UseGuards(AuthGuard(), RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  async delete(@Args('id') id: string): Promise<boolean> {
-    await this.bookService.delete(id);
+  async delete(@Args('bookId') bookId: number): Promise<boolean> {
+    await this.bookService.delete(bookId);
     return true;
   }
 }

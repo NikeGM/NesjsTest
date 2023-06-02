@@ -1,15 +1,16 @@
-import { Book } from 'src/book/book.interface';
 import { MigrationInterface, QueryRunner, Table } from 'typeorm';
+import { DbTables } from '../src/types';
+import { Book } from '../src/book/entity/book.entity';
 
 export class CreateBooksTable1685437594268 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'books',
+        name: DbTables.BOOKS,
         columns: [
           {
-            name: 'id',
+            name: 'bookId',
             type: 'int',
             isPrimary: true,
             isGenerated: true,
@@ -109,6 +110,6 @@ export class CreateBooksTable1685437594268 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable('books');
+    await queryRunner.dropTable(DbTables.BOOKS);
   }
 }

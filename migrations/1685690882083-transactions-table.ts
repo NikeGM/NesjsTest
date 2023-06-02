@@ -1,13 +1,14 @@
 import { MigrationInterface, QueryRunner, Table, TableForeignKey } from 'typeorm';
+import { DbTables } from '../src/types';
 
 export class CreateTransactionsTable1685690882083 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(new Table({
-      name: 'transactions',
+      name: DbTables.TRANSACTIONS,
       columns: [
         {
-          name: 'id',
+          name: 'transactionId',
           type: 'int',
           isPrimary: true,
           isGenerated: true,
@@ -38,22 +39,22 @@ export class CreateTransactionsTable1685690882083 implements MigrationInterface 
       ]
     }), true);
 
-    await queryRunner.createForeignKey('transactions', new TableForeignKey({
+    await queryRunner.createForeignKey(DbTables.TRANSACTIONS, new TableForeignKey({
       columnNames: ['userId'],
-      referencedColumnNames: ['id'],
-      referencedTableName: 'users',
+      referencedColumnNames: ['userId'],
+      referencedTableName: DbTables.USERS,
       onDelete: 'CASCADE'
     }));
 
-    await queryRunner.createForeignKey('transactions', new TableForeignKey({
+    await queryRunner.createForeignKey(DbTables.TRANSACTIONS, new TableForeignKey({
       columnNames: ['bookId'],
-      referencedColumnNames: ['id'],
-      referencedTableName: 'books',
+      referencedColumnNames: ['bookId'],
+      referencedTableName: DbTables.BOOKS,
       onDelete: 'CASCADE'
     }));
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable('transactions');
+    await queryRunner.dropTable(DbTables.TRANSACTIONS);
   }
 }

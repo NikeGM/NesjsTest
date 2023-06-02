@@ -6,17 +6,18 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { User } from './user.interface';
+import { User } from './user.entity';
+import { DbTables } from '../../types';
 
 export enum TransactionAction {
   BUY = 'BUY',
   DEPOSIT = 'DEPOSIT',
 }
 
-@Entity()
+@Entity(DbTables.TRANSACTIONS)
 export class Transaction {
   @PrimaryGeneratedColumn()
-  id: number;
+  transactionId: number;
 
   @Column()
   bookId: number;
