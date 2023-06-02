@@ -11,7 +11,7 @@ export interface CreateUserDto {
   readonly balance: number;
   readonly username: string;
   readonly role: UserRole;
-  readonly password: string;
+  readonly passwordHash: string;
 }
 
 export interface UpdateUserDto {

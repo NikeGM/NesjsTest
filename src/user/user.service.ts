@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject, LoggerService } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto, UpdateUserDto } from './user.interface';
@@ -9,111 +9,143 @@ import { User } from './entity/user.entity';
 import { Book } from '../book/entity/book.entity';
 import { UserBook } from './entity/user-book.entity';
 import { Transaction, TransactionAction } from './entity/transaction.entity';
+import { UserRepository } from './user.repository';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 
 @Injectable()
 export class UserService {
-  private bcrypt: any;
-
   constructor(
     @InjectRepository(User)
-    private userRepository: Repository<User>,
-    @InjectRepository(Book)
-    private bookRepository: Repository<Book>,
+    private userRepository: UserRepository,
     @InjectRepository(Transaction)
     private transactionRepository: Repository<Transaction>,
     @InjectRepository(UserBook)
     private userBookRepository: Repository<UserBook>,
     @InjectRepository(Book)
     private bookService: BookService,
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: LoggerService
   ) {
   }
 
-  async buy(userId: number, bookId: number): Promise<void> {
-    const user = await this.findById(userId);
-    const book = await this.bookService.findById(bookId);
+  async buy(userId: number, bookId: number): Promise<boolean> {
+    try {
+      const user = await this.findById(userId);
+      const book = await this.bookService.findById(bookId);
 
-    if (!user || !book) {
-      throw new Error('User or book not found');
-    }
+      if (!user || !book) {
+        this.logger.error('User or book not found');
+        return false;
+      }
 
-    if (user.balance < book.price) {
-      throw new Error('Insufficient balance');
-    }
+      if (user.balance < book.price) {
+        this.logger.error('Insufficient balance');
+        return false;
+      }
 
-    await this.userRepository.manager.transaction(async (manager) => {
-      user.balance -= book.price;
-      await manager.save(user);
+      await this.userRepository.executeInTransaction(async (manager) => {
+        user.balance -= book.price;
+        await manager.save(user);
 
-      const transaction = this.transactionRepository.create({
-        user,
-        bookId: book.bookId,
-        action: TransactionAction.BUY,
-        amount: book.price,
-        createdAt: new Date(),
+        const transaction = this.transactionRepository.create({
+          user,
+          bookId: book.bookId,
+          action: TransactionAction.BUY,
+          amount: book.price,
+          createdAt: new Date()
+        });
+        await manager.save(transaction);
+
+        const userBook = this.userBookRepository.create({
+          userId: user.userId,
+          bookId: book.bookId,
+          createdAt: new Date()
+        });
+        await manager.save(userBook);
+        return true;
       });
-      await manager.save(transaction);
-
-      const userBook = this.userBookRepository.create({
-        userId: user.userId,
-        bookId: book.bookId,
-        createdAt: new Date(),
-      });
-      await manager.save(userBook);
-    });
+    } catch (error) {
+      this.logger.error(`Failed to execute buy method: ${error.message}`);
+      return false;
+    }
   }
 
   async findAll(): Promise<User[]> {
-    return this.userRepository.find();
+    try {
+      return await this.userRepository.findAll();
+    } catch (error) {
+      this.logger.error(`Failed to execute findAll method: ${error.message}`);
+      return [];
+    }
   }
 
   async findById(userId: number): Promise<User> {
-    return this.userRepository.findOne({ where: { userId } });
+    try {
+      return await this.userRepository.findById(userId);
+    } catch (error) {
+      this.logger.error(`Failed to execute findById method: ${error.message}`);
+      return null;
+    }
   }
 
   async findByUsername(username: string): Promise<User> {
-    return this.userRepository.findOne({ where: { username } });
+    try {
+      return await this.userRepository.findUsername(username);
+    } catch (error) {
+      this.logger.error(`Failed to execute findByUsername method: ${error.message}`);
+      return null;
+    }
   }
 
   async create(input: CreateUserDto): Promise<User> {
-    const hashedPassword = await this.bcrypt.hash(input.password, 10);
-    const newUser = this.userRepository.create({
-      ...input,
-      passwordHash: hashedPassword
-    });
-
-    return this.userRepository.save(newUser);
+    try {
+      return await this.userRepository.create(input);
+    } catch (error) {
+      this.logger.error(`Failed to execute create method: ${error.message}`);
+      return null;
+    }
   }
 
   async update(userId: number, input: UpdateUserDto): Promise<User> {
-    const user = await this.userRepository.findOne({ where: { userId } });
-
-    if (user) {
-      const updatedUser = this.userRepository.merge(user, input);
-      return this.userRepository.save(updatedUser);
+    try {
+      return await this.userRepository.update(userId, input);
+    } catch (error) {
+      this.logger.error(`Failed to execute update method: ${error.message}`);
+      return null;
     }
-    return null;
   }
 
   async delete(userId: number): Promise<boolean> {
-    const result = await this.userRepository.delete(userId);
-    return result.affected > 0;
+    try {
+      await this.userRepository.delete(userId);
+      return true;
+    } catch (error) {
+      this.logger.error(`Failed to execute delete method: ${error.message}`);
+      return false;
+    }
   }
 
   async validateUser(userLoginData: UserLoginData): Promise<User> {
-    const { username, passwordHash } = userLoginData;
+    try {
+      const { username, passwordHash } = userLoginData;
 
-    const user = await this.findByUsername(username);
+      const user = await this.findByUsername(username);
 
-    if (!user) {
-      throw new Error('Invalid credentials');
+      if (!user) {
+        this.logger.error('Invalid credentials');
+        return null;
+      }
+
+      const isPasswordMatching = await bcrypt.compare(passwordHash, user.passwordHash);
+
+      if (!isPasswordMatching) {
+        this.logger.error('Invalid credentials');
+        return null;
+      }
+
+      return user;
+    } catch (error) {
+      this.logger.error(`Failed to validate user: ${error.message}`);
+      return null;
     }
-
-    const isPasswordMatching = await bcrypt.compare(passwordHash, user.passwordHash);
-
-    if (!isPasswordMatching) {
-      throw new Error('Invalid credentials');
-    }
-
-    return user;
   }
 }

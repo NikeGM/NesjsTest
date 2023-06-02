@@ -5,9 +5,17 @@ import { ApolloDriver } from '@nestjs/apollo';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from '../auth/auth.module';
 import { UserModule } from '../user/user.module';
+import winston from 'winston';
+import { WinstonModule } from 'nest-winston';
 
 @Module({
   imports: [
+    WinstonModule.forRoot({
+      transports: [
+        new winston.transports.Console(),
+        new winston.transports.File({ filename: 'logfile.log' })
+      ]
+    }),
     GraphQLModule.forRoot({
       autoSchemaFile: 'schema.gql',
       driver: ApolloDriver

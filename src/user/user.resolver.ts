@@ -47,7 +47,7 @@ export class UserResolver {
 
   @Mutation(returns => Boolean)
   @UseGuards(AuthGuard())
-  async buy(@Context('user') user: UserGraphQL, @Args('bookId') bookId: number): Promise<void> {
+  async buy(@Context('user') user: UserGraphQL, @Args('bookId') bookId: number): Promise<boolean> {
     return this.userService.buy(user.userId, bookId);
   }
 }
