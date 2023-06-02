@@ -3,7 +3,7 @@
 # ------------------------------------------------------
 
 type BookGraphQL {
-  id: ID!
+  bookId: ID!
   title: String!
   author: String!
   description: String!
@@ -20,13 +20,13 @@ scalar DateTime
 
 type Query {
   findAll: [BookGraphQL!]!
-  findOne(id: String!): BookGraphQL
+  findOne(bookId: Float!): BookGraphQL
 }
 
 type Mutation {
   create(input: CreateBookGraphQL!): BookGraphQL!
-  update(id: String!, input: UpdateBookGraphQL!): BookGraphQL!
-  delete(id: String!): Boolean!
+  update(bookId: Float!, input: UpdateBookGraphQL!): BookGraphQL!
+  delete(bookId: Float!): Boolean!
 }
 
 input CreateBookGraphQL {

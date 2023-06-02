@@ -1,6 +1,6 @@
 import { Resolver, Query, Args, Mutation } from '@nestjs/graphql';
 import { BookService } from './book.service';
-import { BookGraphQL, CreateBookDto, UpdateBookDto } from './book.interface';
+import { BookGraphQL, CreateBookDto, CreateBookGraphQL, UpdateBookDto, UpdateBookGraphQL } from './book.interface';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../role/role.guard';
@@ -26,14 +26,14 @@ export class BookResolver {
   @Mutation(returns => BookGraphQL)
   @UseGuards(AuthGuard(), RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  async create(@Args('input') input: CreateBookDto): Promise<Book> {
+  async create(@Args('input') input: CreateBookGraphQL): Promise<Book> {
     return this.bookService.create(input);
   }
 
   @Mutation(returns => BookGraphQL)
   @UseGuards(AuthGuard(), RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  async update(@Args('bookId') bookId: number, @Args('input') input: UpdateBookDto): Promise<Book> {
+  async update(@Args('bookId') bookId: number, @Args('input') input: UpdateBookGraphQL): Promise<Book> {
     return this.bookService.update(bookId, input);
   }
 
