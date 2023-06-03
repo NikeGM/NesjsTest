@@ -1,4 +1,4 @@
-import { Injectable, CanActivate, ExecutionContext, Inject } from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, Inject, ForbiddenException, UnauthorizedException } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { UserRole } from './user.interface';
 import { GqlExecutionContext } from '@nestjs/graphql';
@@ -13,23 +13,23 @@ export class UserAccessGuard implements CanActivate {
   canActivate(
     context: ExecutionContext
   ): boolean | Promise<boolean> | Observable<boolean> {
-    try {
-      const request = context.switchToHttp().getRequest();
-      const user = request.user;
-      const params = request.params;
+    const request = context.switchToHttp().getRequest();
+    const user = request.user;
+    const params = request.params;
 
-      const isManager = user.role === UserRole.MANAGER || user.role == UserRole.ADMIN;
-
-      if (!isManager && user.userId !== params.userId) {
-        this.logger.warn(`Access denied for user ${user.userId}`);
-        return false;
-      }
-
-      return true;
-    } catch (error) {
-      this.logger.error(`UserAccessGuard failed with error: ${error.message}`);
-      return false;
+    if (!user) {
+      this.logger.warn(`Unauthorized access attempt`);
+      throw new UnauthorizedException();
     }
+
+    const isManager = user.role === UserRole.MANAGER || user.role == UserRole.ADMIN;
+
+    if (!isManager && user.userId !== params.userId) {
+      this.logger.warn(`Access denied for user ${user.userId}`);
+      throw new ForbiddenException();
+    }
+
+    return true;
   }
 }
 
@@ -41,20 +41,20 @@ export class UserAccessGraphQlGuard implements CanActivate {
   canActivate(
     context: ExecutionContext
   ): boolean | Promise<boolean> | Observable<boolean> {
-    try {
-      const ctx = GqlExecutionContext.create(context);
-      const user = ctx.getContext().req.user;
-      const params = ctx.getArgs();
+    const ctx = GqlExecutionContext.create(context);
+    const user = ctx.getContext().req.user;
+    const params = ctx.getArgs();
 
-      if (user.role !== UserRole.MANAGER && user.userId !== params.userId) {
-        this.logger.warn(`Access denied for user ${user.userId}`);
-        return false;
-      }
-
-      return true;
-    } catch (error) {
-      this.logger.error(`UserAccessGraphQlGuard failed with error: ${error.message}`);
-      return false;
+    if (!user) {
+      this.logger.warn(`Unauthorized access attempt`);
+      throw new UnauthorizedException();
     }
+
+    if (user.role !== UserRole.MANAGER && user.userId !== params.userId) {
+      this.logger.warn(`Access denied for user ${user.userId}`);
+      throw new ForbiddenException();
+    }
+
+    return true;
   }
 }

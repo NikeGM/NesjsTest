@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { Repository, EntityManager } from 'typeorm';
 import { InjectRepository, InjectEntityManager } from '@nestjs/typeorm';
 import { CreateUserDto, UpdateUserDto } from './user.interface';
@@ -21,25 +21,33 @@ export class UserRepository {
       return await this.userRepository.find();
     } catch (error) {
       this.logger.error('Failed to find all users', error.stack);
-      return [];
+      throw new InternalServerErrorException('Failed to find all users');
     }
   }
 
   async findById(userId: number): Promise<User> {
     try {
-      return await this.userRepository.findOne({ where: { userId } });
+      const user = await this.userRepository.findOne({ where: { userId } });
+      if (!user) {
+        throw new NotFoundException(`User with id: ${userId} not found`);
+      }
+      return user;
     } catch (error) {
       this.logger.error(`Failed to find user with id: ${userId}`, error.stack);
-      return null;
+      throw new NotFoundException(`User with id: ${userId} not found`);
     }
   }
 
   async findUsername(username: string): Promise<User> {
     try {
-      return await this.userRepository.findOne({ where: { username } });
+      const user = await this.userRepository.findOne({ where: { username } });
+      if (!user) {
+        throw new NotFoundException(`User with username: ${username} not found`);
+      }
+      return user;
     } catch (error) {
       this.logger.error(`Failed to find user with username: ${username}`, error.stack);
-      return null;
+      throw new NotFoundException(`User with username: ${username} not found`);
     }
   }
 
@@ -49,29 +57,34 @@ export class UserRepository {
       return await this.userRepository.save(user);
     } catch (error) {
       this.logger.error('Failed to create user', error.stack);
-      return null;
+      throw new InternalServerErrorException('Failed to create user');
     }
   }
 
   async update(userId: number, userDto: UpdateUserDto): Promise<User> {
     try {
       const user = await this.userRepository.findOne({ where: { userId } });
-      if (user) {
-        const updatedUser = this.userRepository.merge(user, userDto);
-        return await this.userRepository.save(updatedUser);
+      if (!user) {
+        throw new NotFoundException(`User with id: ${userId} not found`);
       }
-      return null;
+      const updatedUser = this.userRepository.merge(user, userDto);
+      return await this.userRepository.save(updatedUser);
     } catch (error) {
       this.logger.error(`Failed to update user with id: ${userId}`, error.stack);
-      return null;
+      throw new InternalServerErrorException(`Failed to update user with id: ${userId}`);
     }
   }
 
-  async delete(userId: number): Promise<void> {
+  async delete(userId: number): Promise<boolean> {
     try {
-      await this.userRepository.delete(userId);
+      const result = await this.userRepository.delete(userId);
+      if (!result.affected) {
+        throw new NotFoundException(`User with id: ${userId} not found`);
+      }
+      return true;
     } catch (error) {
       this.logger.error(`Failed to delete user with id: ${userId}`, error.stack);
+      throw new InternalServerErrorException(`Failed to delete user with id: ${userId}`);
     }
   }
 
@@ -80,7 +93,7 @@ export class UserRepository {
       return await this.entityManager.transaction(execution);
     } catch (error) {
       this.logger.error('Failed to execute transaction', error.stack);
-      return null;
+      throw new InternalServerErrorException('Failed to execute transaction');
     }
   }
 }

@@ -1,4 +1,4 @@
-import { Injectable, Inject, LoggerService } from '@nestjs/common';
+import { BadRequestException, NotFoundException, Injectable, Inject, LoggerService } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto, UpdateUserDto } from './user.interface';
@@ -32,14 +32,16 @@ export class UserService {
       const user = await this.findById(userId);
       const book = await this.bookService.findById(bookId);
 
-      if (!user || !book) {
-        this.logger.error('User or book not found');
-        return false;
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+
+      if (!book) {
+        throw new NotFoundException('Book not found');
       }
 
       if (user.balance < book.price) {
-        this.logger.error('Insufficient balance');
-        return false;
+        throw new BadRequestException('Insufficient balance');
       }
 
       await this.userRepository.executeInTransaction(async (manager) => {
@@ -61,66 +63,89 @@ export class UserService {
           createdAt: new Date()
         });
         await manager.save(userBook);
-        return true;
       });
+      return true;
     } catch (error) {
       this.logger.error(`Failed to execute buy method: ${error.message}`);
-      return false;
+      throw new BadRequestException('Failed to execute buy method');
     }
   }
 
   async findAll(): Promise<User[]> {
     try {
-      return await this.userRepository.findAll();
+      const users = await this.userRepository.findAll();
+      if (!users) {
+        throw new NotFoundException('Users not found');
+      }
+      return users;
     } catch (error) {
       this.logger.error(`Failed to execute findAll method: ${error.message}`);
-      return [];
+      throw new BadRequestException('Failed to execute findAll method');
     }
   }
 
   async findById(userId: number): Promise<User> {
     try {
-      return await this.userRepository.findById(userId);
+      const user = await this.userRepository.findById(userId);
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+      return user;
     } catch (error) {
       this.logger.error(`Failed to execute findById method: ${error.message}`);
-      return null;
+      throw new BadRequestException('Failed to execute findById method');
     }
   }
 
   async findByUsername(username: string): Promise<User> {
     try {
-      return await this.userRepository.findUsername(username);
+      const user = await this.userRepository.findUsername(username);
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+      return user;
     } catch (error) {
       this.logger.error(`Failed to execute findByUsername method: ${error.message}`);
-      return null;
+      throw new BadRequestException('Failed to execute findByUsername method');
     }
   }
 
   async create(input: CreateUserDto): Promise<User> {
     try {
-      return await this.userRepository.create(input);
+      const user = await this.userRepository.create(input);
+      if (!user) {
+        throw new BadRequestException('Failed to create user');
+      }
+      return user;
     } catch (error) {
       this.logger.error(`Failed to execute create method: ${error.message}`);
-      return null;
+      throw new BadRequestException('Failed to execute create method');
     }
   }
 
   async update(userId: number, input: UpdateUserDto): Promise<User> {
     try {
-      return await this.userRepository.update(userId, input);
+      const user = await this.userRepository.update(userId, input);
+      if (!user) {
+        throw new BadRequestException('Failed to update user');
+      }
+      return user;
     } catch (error) {
       this.logger.error(`Failed to execute update method: ${error.message}`);
-      return null;
+      throw new BadRequestException('Failed to execute update method');
     }
   }
 
   async delete(userId: number): Promise<boolean> {
     try {
-      await this.userRepository.delete(userId);
+      const result = await this.userRepository.delete(userId);
+      if (!result) {
+        throw new BadRequestException('Failed to delete user');
+      }
       return true;
     } catch (error) {
       this.logger.error(`Failed to execute delete method: ${error.message}`);
-      return false;
+      throw new BadRequestException('Failed to execute delete method');
     }
   }
 
@@ -131,21 +156,19 @@ export class UserService {
       const user = await this.findByUsername(username);
 
       if (!user) {
-        this.logger.error('Invalid credentials');
-        return null;
+        throw new BadRequestException('Invalid credentials');
       }
 
       const isPasswordMatching = await bcrypt.compare(passwordHash, user.passwordHash);
 
       if (!isPasswordMatching) {
-        this.logger.error('Invalid credentials');
-        return null;
+        throw new BadRequestException('Invalid credentials');
       }
 
       return user;
     } catch (error) {
       this.logger.error(`Failed to validate user: ${error.message}`);
-      return null;
+      throw new BadRequestException('Failed to validate user');
     }
   }
 }

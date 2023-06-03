@@ -1,4 +1,16 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, UseGuards, Req } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Param,
+  Body,
+  UseGuards,
+  Req,
+  NotFoundException,
+  BadRequestException
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto, UpdateUserDto, UserDto, UserRole } from './user.interface';
 import { AuthGuard } from '@nestjs/passport';
@@ -6,7 +18,7 @@ import { RolesGuard } from '../role/role.guard';
 import { Roles } from '../role/role.decorator';
 import { UserAccessGuard } from './user-access.guard';
 import { User } from './entity/user.entity';
-import { WinstonLogger as Logger } from 'nest-winston';
+import { Logger } from '@nestjs/common';
 
 @Controller('users')
 export class UserController {
@@ -26,7 +38,7 @@ export class UserController {
       return users.map(this.userToDtoFormat);
     } catch (error) {
       this.logger.error(`Failed to fetch all users: ${error.message}`);
-      return [];
+      throw new BadRequestException(`Failed to fetch all users: ${error.message}`);
     }
   }
 
@@ -36,11 +48,15 @@ export class UserController {
   async findOne(@Param('userId') userId: number): Promise<UserDto> {
     try {
       const user = await this.userService.findById(userId);
+      if (!user) {
+        this.logger.warn(`Failed to fetch user with ID: ${userId}`);
+        throw new NotFoundException(`User with ID: ${userId} not found`);
+      }
       this.logger.log(`Successfully fetched user with ID: ${userId}`);
       return this.userToDtoFormat(user);
     } catch (error) {
       this.logger.error(`Failed to fetch user with ID: ${userId}. Error: ${error.message}`);
-      return null;
+      throw new NotFoundException(`User with ID: ${userId} not found`);
     }
   }
 
@@ -52,7 +68,7 @@ export class UserController {
       return this.userToDtoFormat(user);
     } catch (error) {
       this.logger.error(`Failed to create user. Error: ${error.message}`);
-      return null;
+      throw new BadRequestException(`Failed to create user. Error: ${error.message}`);
     }
   }
 
@@ -62,11 +78,15 @@ export class UserController {
   async update(@Param('userId') userId: number, @Body() input: UpdateUserDto): Promise<UserDto> {
     try {
       const user = await this.userService.update(userId, input);
+      if (!user) {
+        this.logger.warn(`Failed to update user with ID: ${userId}`);
+        throw new NotFoundException(`User with ID: ${userId} not found`);
+      }
       this.logger.log(`Successfully updated user with ID: ${userId}`);
       return this.userToDtoFormat(user);
     } catch (error) {
       this.logger.error(`Failed to update user with ID: ${userId}. Error: ${error.message}`);
-      return null;
+      throw new BadRequestException(`Failed to update user with ID: ${userId}. Error: ${error.message}`);
     }
   }
 
@@ -76,11 +96,15 @@ export class UserController {
   async delete(@Param('userId') userId: number): Promise<boolean> {
     try {
       const result = await this.userService.delete(userId);
+      if (!result) {
+        this.logger.warn(`Failed to delete user with ID: ${userId}`);
+        throw new NotFoundException(`User with ID: ${userId} not found`);
+      }
       this.logger.log(`Successfully deleted user with ID: ${userId}`);
       return result;
     } catch (error) {
       this.logger.error(`Failed to delete user with ID: ${userId}. Error: ${error.message}`);
-      return false;
+      throw new BadRequestException(`Failed to delete user with ID: ${userId}. Error: ${error.message}`);
     }
   }
 
@@ -89,11 +113,15 @@ export class UserController {
   async buy(@Req() req, @Body('bookId') bookId: number) {
     try {
       const result = await this.userService.buy(req.user.userId, bookId);
+      if (!result) {
+        this.logger.warn(`Failed to buy book with ID: ${bookId} for user with ID: ${req.user.userId}`);
+        throw new BadRequestException(`Failed to buy book with ID: ${bookId} for user with ID: ${req.user.userId}`);
+      }
       this.logger.log(`Successfully bought book with ID: ${bookId} for user with ID: ${req.user.userId}`);
       return result;
     } catch (error) {
       this.logger.error(`Failed to buy book with ID: ${bookId} for user with ID: ${req.user.userId}. Error: ${error.message}`);
-      return null;
+      throw new BadRequestException(`Failed to buy book with ID: ${bookId} for user with ID: ${req.user.userId}. Error: ${error.message}`);
     }
   }
 

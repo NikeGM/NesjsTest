@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload, UserLoginData } from './auth.interface';
 import { UserService } from '../user/user.service';
@@ -19,7 +19,7 @@ export class AuthService {
       const user = await this.usersService.validateUser(userLoginData);
       if (!user) {
         this.logger.warn(`Failed login attempt for username: ${userLoginData.username}`);
-        return null;
+        throw new UnauthorizedException('Invalid credentials');
       }
 
       const payload: JwtPayload = { userId: user.userId };
@@ -31,7 +31,7 @@ export class AuthService {
       };
     } catch (error) {
       this.logger.error('Error in login', error.stack);
-      return null;
+      throw error;
     }
   }
 }

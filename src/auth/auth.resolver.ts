@@ -2,7 +2,7 @@ import { Args, Mutation, Resolver } from '@nestjs/graphql';
 import { AuthService } from './auth.service';
 import { UserService } from '../user/user.service';
 import { LoginResultGraphQL, UserLoginInput } from './auth.interface';
-import { Logger } from '@nestjs/common';
+import { Logger, UnauthorizedException } from '@nestjs/common';
 
 @Resolver()
 export class AuthResolver {
@@ -15,19 +15,19 @@ export class AuthResolver {
   }
 
   @Mutation(() => LoginResultGraphQL)
-  async login(@Args('input') userLoginData: UserLoginInput): Promise<LoginResultGraphQL | null> {
+  async login(@Args('input') userLoginData: UserLoginInput): Promise<LoginResultGraphQL> {
     try {
       const result = await this.userService.validateUser(userLoginData);
 
       if (!result) {
         this.logger.warn(`Failed login attempt for username: ${userLoginData.username}`);
-        return null;
+        throw new UnauthorizedException('Invalid credentials');
       }
 
       return this.authService.login(result);
     } catch (error) {
       this.logger.error('Error in login', error.stack);
-      return null;
+      throw error;
     }
   }
 }

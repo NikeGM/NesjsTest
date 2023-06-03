@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, UnauthorizedException, InternalServerErrorException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UserLoginData } from './auth.interface';
 import { Logger } from '@nestjs/common';
@@ -17,13 +17,13 @@ export class AuthController {
 
       if (!result) {
         this.logger.warn(`Failed login attempt for username: ${userLoginData.username}`);
-        return null;
+        throw new UnauthorizedException('Invalid credentials');
       }
 
       return result;
     } catch (error) {
       this.logger.error('Error in login', error.stack);
-      return null;
+      throw new InternalServerErrorException();
     }
   }
 }

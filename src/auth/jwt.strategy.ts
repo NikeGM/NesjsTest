@@ -1,6 +1,6 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { JwtPayload } from './auth.interface';
 import { Logger } from '@nestjs/common';
@@ -21,12 +21,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       const user = await this.userService.findById(payload.userId);
       if (!user) {
         this.logger.warn(`Invalid JWT payload, user with id ${payload.userId} not found.`);
-        return null;
+        throw new UnauthorizedException('Invalid token');
       }
       return user;
     } catch (error) {
       this.logger.error('Error validating JWT', error.stack);
-      return null;
+      throw error;
     }
   }
 }

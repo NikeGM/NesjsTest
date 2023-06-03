@@ -1,7 +1,7 @@
 import { Resolver, Query, Args, Mutation } from '@nestjs/graphql';
 import { BookService } from './book.service';
 import { BookGraphQL, CreateBookDto, CreateBookGraphQL, UpdateBookDto, UpdateBookGraphQL } from './book.interface';
-import { UseGuards } from '@nestjs/common';
+import { UseGuards, NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../role/role.guard';
 import { Roles } from '../role/role.decorator';
@@ -22,17 +22,21 @@ export class BookResolver {
       return this.bookService.findAll();
     } catch (error) {
       this.logger.error('Error fetching all books', error.stack);
-      return [];
+      throw new InternalServerErrorException('Error fetching all books');
     }
   }
 
   @Query(returns => BookGraphQL, { nullable: true })
   async findOne(@Args('bookId') bookId: number): Promise<Book> {
     try {
-      return this.bookService.findById(bookId);
+      const book = await this.bookService.findById(bookId);
+      if (!book) {
+        throw new NotFoundException(`Book with ID ${bookId} not found`);
+      }
+      return book;
     } catch (error) {
       this.logger.error(`Error fetching book with id ${bookId}`, error.stack);
-      return null;
+      throw new InternalServerErrorException('Error fetching book');
     }
   }
 
@@ -44,7 +48,7 @@ export class BookResolver {
       return this.bookService.create(input);
     } catch (error) {
       this.logger.error('Error creating a book', error.stack);
-      return null;
+      throw new InternalServerErrorException('Error creating a book');
     }
   }
 
@@ -53,10 +57,14 @@ export class BookResolver {
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
   async update(@Args('bookId') bookId: number, @Args('input') input: UpdateBookGraphQL): Promise<Book> {
     try {
-      return this.bookService.update(bookId, input);
+      const book = await this.bookService.update(bookId, input);
+      if (!book) {
+        throw new NotFoundException(`Book with ID ${bookId} not found`);
+      }
+      return book;
     } catch (error) {
       this.logger.error(`Error updating book with id ${bookId}`, error.stack);
-      return null;
+      throw new InternalServerErrorException('Error updating a book');
     }
   }
 
@@ -65,11 +73,14 @@ export class BookResolver {
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
   async delete(@Args('bookId') bookId: number): Promise<boolean> {
     try {
-      await this.bookService.delete(bookId);
+      const result = await this.bookService.delete(bookId);
+      if (!result) {
+        throw new NotFoundException(`Book with ID ${bookId} not found`);
+      }
       return true;
     } catch (error) {
       this.logger.error(`Error deleting book with id ${bookId}`, error.stack);
-      return false;
+      throw new InternalServerErrorException('Error deleting a book');
     }
   }
 }

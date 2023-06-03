@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateBookDto, UpdateBookDto } from './book.interface';
@@ -20,16 +20,20 @@ export class BookRepository {
       return this.bookRepository.find();
     } catch (error) {
       this.logger.error('Error fetching all books', error.stack);
-      return [];
+      throw new InternalServerErrorException('Error fetching all books');
     }
   }
 
   async findById(bookId: number): Promise<Book> {
     try {
-      return this.bookRepository.findOne({ where: { bookId } });
+      const book = await this.bookRepository.findOne({ where: { bookId } });
+      if (!book) {
+        throw new NotFoundException(`Book with ID ${bookId} not found`);
+      }
+      return book;
     } catch (error) {
       this.logger.error(`Error fetching book with id ${bookId}`, error.stack);
-      return null;
+      throw new InternalServerErrorException('Error fetching book');
     }
   }
 
@@ -39,30 +43,34 @@ export class BookRepository {
       return this.bookRepository.save(book);
     } catch (error) {
       this.logger.error('Error creating a book', error.stack);
-      return null;
+      throw new InternalServerErrorException('Error creating a book');
     }
   }
 
   async update(bookId: number, bookDto: UpdateBookDto): Promise<Book> {
     try {
       const book = await this.bookRepository.findOne({ where: { bookId } });
-      if (book) {
-        const updatedBook = this.bookRepository.merge(book, bookDto);
-        return this.bookRepository.save(updatedBook);
+      if (!book) {
+        throw new NotFoundException(`Book with ID ${bookId} not found`);
       }
+      const updatedBook = this.bookRepository.merge(book, bookDto);
+      return this.bookRepository.save(updatedBook);
     } catch (error) {
       this.logger.error(`Error updating book with id ${bookId}`, error.stack);
+      throw new InternalServerErrorException('Error updating a book');
     }
-    return null;
   }
 
   async delete(bookId: number): Promise<boolean> {
     try {
-      await this.bookRepository.delete(bookId);
+      const deleteResult = await this.bookRepository.delete(bookId);
+      if (deleteResult.affected === 0) {
+        throw new NotFoundException(`Book with ID ${bookId} not found`);
+      }
       return true;
     } catch (error) {
       this.logger.error(`Error deleting book with id ${bookId}`, error.stack);
-      return false;
+      throw new InternalServerErrorException('Error deleting a book');
     }
   }
 }

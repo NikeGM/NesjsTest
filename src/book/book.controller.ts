@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotFoundException, Param, Post, Put, UseGuards, InternalServerErrorException } from '@nestjs/common';
 import { CreateBookDto, UpdateBookDto } from './book.interface';
 import { BookService } from './book.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -21,17 +21,22 @@ export class BookController {
       return await this.bookService.findAll();
     } catch (error) {
       this.logger.error('Error fetching all books', error.stack);
-      return [];
+      throw new InternalServerErrorException('Error fetching all books');
     }
   }
 
   @Get(':bookId')
   async findOne(@Param('bookId') bookId: number): Promise<Book> {
     try {
-      return await this.bookService.findById(bookId);
+      const book = await this.bookService.findById(bookId);
+      if (!book) {
+        this.logger.warn(`No book found with id ${bookId}`);
+        throw new NotFoundException(`No book found with id ${bookId}`);
+      }
+      return book;
     } catch (error) {
       this.logger.error(`Error fetching book with id ${bookId}`, error.stack);
-      return null;
+      throw new InternalServerErrorException('Error fetching book');
     }
   }
 
@@ -43,7 +48,7 @@ export class BookController {
       return await this.bookService.create(book);
     } catch (error) {
       this.logger.error('Error creating a book', error.stack);
-      return null;
+      throw new InternalServerErrorException('Error creating a book');
     }
   }
 
@@ -55,7 +60,7 @@ export class BookController {
       return await this.bookService.update(bookId, book);
     } catch (error) {
       this.logger.error(`Error updating book with id ${bookId}`, error.stack);
-      return null;
+      throw new InternalServerErrorException('Error updating a book');
     }
   }
 
@@ -67,6 +72,7 @@ export class BookController {
       await this.bookService.delete(bookId);
     } catch (error) {
       this.logger.error(`Error deleting book with id ${bookId}`, error.stack);
+      throw new InternalServerErrorException('Error deleting a book');
     }
   }
 }
