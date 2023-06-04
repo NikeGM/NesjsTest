@@ -10,7 +10,7 @@ import { ExpressAdapter } from '@nestjs/platform-express';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, new ExpressAdapter());
   // const app = await NestFactory.create(AppModule, new FastifyAdapter());
-  await app.listen(3000);
+  await app.listen(+process.env.API_PORT || 3000);
 }
 
 bootstrap();
