@@ -1,13 +1,10 @@
 # NestJS BookStore Sample
 
-This project serves as an example of a simple service - a book store - built with NestJS and TypeORM.
+The service demonstrates basic functionalities including user management, book creation and editing, book purchasing, role management, and authorization via JWT.
 
 ## Description
 
-This book store service is designed as a straightforward application to demonstrate the capabilities of NestJS and TypeORM. The application allows users to interact with the store in a variety of ways, including browsing books, purchasing books, and managing user profiles.
-
-Built on top of NestJS, the project utilizes the framework's robustness and flexibility to efficiently handle different types of requests and manage various services. TypeORM, a powerful ORM tool for TypeScript and JavaScript, is used for data management, allowing convenient and efficient operations on the database.
-
+g
 ## Prerequisites
 
 - Docker and Docker Compose are installed on your system.
