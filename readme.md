@@ -1,10 +1,10 @@
 # NestJS BookStore Sample
 
-The service demonstrates basic functionalities including user management, book creation and editing, book purchasing, role management, and authorization via JWT.
 
 ## Description
 
-g
+The service demonstrates basic functionalities including user management, book creation and editing, book purchasing, role management, and authorization via JWT.
+
 ## Prerequisites
 
 - Docker and Docker Compose are installed on your system.
