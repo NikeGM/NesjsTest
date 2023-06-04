@@ -13,3 +13,4 @@ procfile.json
 /libs/noft-game
 ../noft-bc-reader/.secret
 ../noft-bc-reader/.secret-users
+logfile.log
