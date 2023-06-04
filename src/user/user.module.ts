@@ -9,6 +9,9 @@ import { Book } from '../book/entity/book.entity';
 import { BookModule } from '../book/book.module';
 import { PassportModule } from '@nestjs/passport';
 import { UserController } from './user.controller';
+import { UserResolver } from './user.resolver';
+import { BookService } from '../book/book.service';
+import { BookRepository } from '../book/book.repository';
 
 @Module({
   imports:
@@ -16,7 +19,7 @@ import { UserController } from './user.controller';
       BookModule,
       PassportModule.register({ defaultStrategy: 'jwt' })
     ],
-  providers: [UserRepository, UserService, UserController, Logger],
+  providers: [UserRepository, UserService, UserController, Logger, UserResolver, BookService, BookRepository],
   exports: [TypeOrmModule, UserRepository, UserService, UserController]
 })
 export class UserModule {

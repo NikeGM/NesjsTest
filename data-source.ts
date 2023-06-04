@@ -11,12 +11,13 @@ export const connectionSource = new DataSource({
   username: process.env.POSTGRES_USER,
   password: process.env.POSTGRES_PASSWORD,
   database: process.env.POSTGRES_DB,
-  logging: false,
+  logging: true,
   synchronize: false,
   name: 'default',
   entities: ['src/**/**.entity{.ts,.js}'],
   migrations: ['migrations/**/*{.ts,.js}'],
-  subscribers: ['subscriber/**/*{.ts,.js}']
+  subscribers: ['subscriber/**/*{.ts,.js}'],
+
 });
 
 connectionSource.initialize()

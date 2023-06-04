@@ -25,7 +25,8 @@ export class CreateUserTable1685621583345 implements MigrationInterface {
         },
         {
           name: 'username',
-          type: 'varchar'
+          type: 'varchar',
+          isUnique: true
         },
         {
           name: 'role',
@@ -65,7 +66,7 @@ export class CreateUserTable1685621583345 implements MigrationInterface {
     manager.balance = 1000
     manager.role = UserRole.MANAGER
     manager.passwordHash = managerPassword
-    await queryRunner.manager.save(admin);
+    await queryRunner.manager.save(manager);
 
   }
 

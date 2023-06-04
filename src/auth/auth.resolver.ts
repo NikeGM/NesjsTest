@@ -17,14 +17,20 @@ export class AuthResolver {
   @Mutation(() => LoginResultGraphQL)
   async login(@Args('input') userLoginData: UserLoginInput): Promise<LoginResultGraphQL> {
     try {
-      const result = await this.userService.validateUser(userLoginData);
+      const result = await this.userService.validateUser({
+        password: userLoginData.password,
+        username: userLoginData.username
+      });
 
       if (!result) {
         this.logger.warn(`Failed login attempt for username: ${userLoginData.username}`);
         throw new UnauthorizedException('Invalid credentials');
       }
 
-      return this.authService.login(result);
+      return this.authService.login({
+        password: userLoginData.password,
+        username: userLoginData.username
+      });
     } catch (error) {
       this.logger.error('Error in login', error.stack);
       throw error;

@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
-import { BookModule } from '../book/book.module';
+import { BookModule } from './book/book.module';
 import { ApolloDriver } from '@nestjs/apollo';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthModule } from '../auth/auth.module';
-import { UserModule } from '../user/user.module';
+import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
 import winston from 'winston';
 import { WinstonModule } from 'nest-winston';
 
@@ -28,7 +28,8 @@ import { WinstonModule } from 'nest-winston';
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DB,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true
+      synchronize: false,
+      logging: true
     }),
     BookModule,
     AuthModule,

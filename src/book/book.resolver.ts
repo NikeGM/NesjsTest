@@ -3,11 +3,12 @@ import { BookService } from './book.service';
 import { BookGraphQL, CreateBookDto, CreateBookGraphQL, UpdateBookDto, UpdateBookGraphQL } from './book.interface';
 import { UseGuards, NotFoundException, InternalServerErrorException, CanActivate } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { RolesGuard } from '../role/role.guard';
+import { RolesGuard, RolesGuardGraphQL } from '../role/role.guard';
 import { Roles } from '../role/role.decorator';
 import { UserRole } from '../user/user.interface';
 import { Book } from './entity/book.entity';
 import { Logger } from '@nestjs/common';
+import { AuthGuardGraphQL } from '../auth/auth.guard';
 
 @Resolver(of => BookGraphQL)
 export class BookResolver {
@@ -17,7 +18,7 @@ export class BookResolver {
   }
 
   @Query(returns => [BookGraphQL])
-  async findAll(): Promise<Book[]> {
+  async getBooks(): Promise<Book[]> {
     try {
       return this.bookService.findAll();
     } catch (error) {
@@ -27,7 +28,7 @@ export class BookResolver {
   }
 
   @Query(returns => BookGraphQL, { nullable: true })
-  async findOne(@Args('bookId') bookId: number): Promise<Book> {
+  async getBook(@Args('bookId') bookId: number): Promise<Book> {
     try {
       const book = await this.bookService.findById(bookId);
       if (!book) {
@@ -41,9 +42,9 @@ export class BookResolver {
   }
 
   @Mutation(returns => BookGraphQL)
-  @UseGuards(AuthGuard(), RolesGuard)
+  @UseGuards(AuthGuardGraphQL, RolesGuardGraphQL)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  async create(@Args('input') input: CreateBookGraphQL): Promise<Book> {
+  async createBook(@Args('input') input: CreateBookGraphQL): Promise<Book> {
     try {
       return this.bookService.create(input);
     } catch (error) {
@@ -53,9 +54,9 @@ export class BookResolver {
   }
 
   @Mutation(returns => BookGraphQL)
-  @UseGuards(AuthGuard(), RolesGuard)
+  @UseGuards(AuthGuardGraphQL, RolesGuardGraphQL)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  async update(@Args('bookId') bookId: number, @Args('input') input: UpdateBookGraphQL): Promise<Book> {
+  async updateBook(@Args('bookId') bookId: number, @Args('input') input: UpdateBookGraphQL): Promise<Book> {
     try {
       const book = await this.bookService.update(bookId, input);
       if (!book) {
@@ -69,9 +70,9 @@ export class BookResolver {
   }
 
   @Mutation(returns => Boolean)
-  @UseGuards(AuthGuard(), RolesGuard)
+  @UseGuards(AuthGuardGraphQL, RolesGuardGraphQL)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  async delete(@Args('bookId') bookId: number): Promise<boolean> {
+  async deleteBook(@Args('bookId') bookId: number): Promise<boolean> {
     try {
       const result = await this.bookService.delete(bookId);
       if (!result) {

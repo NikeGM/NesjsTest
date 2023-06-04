@@ -3,15 +3,14 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
-  CreateDateColumn,
-  UpdateDateColumn,
+  CreateDateColumn, JoinColumn
 } from 'typeorm';
 import { User } from './user.entity';
 import { DbTables } from '../../types';
 
 export enum TransactionAction {
-  BUY = 'BUY',
-  DEPOSIT = 'DEPOSIT',
+  BUY = 'buy',
+  DEPOSIT = 'deposit',
 }
 
 @Entity(DbTables.TRANSACTIONS)
@@ -25,7 +24,7 @@ export class Transaction {
   @Column({
     type: 'enum',
     enum: TransactionAction,
-    default: TransactionAction.BUY,
+    default: TransactionAction.BUY
   })
   action: TransactionAction;
 
@@ -33,11 +32,9 @@ export class Transaction {
   amount: number;
 
   @ManyToOne(() => User, (user) => user.transactions)
+  @JoinColumn({ name: 'userId' })
   user: User;
 
   @CreateDateColumn()
   createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
 }

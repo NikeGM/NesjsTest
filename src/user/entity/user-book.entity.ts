@@ -3,7 +3,7 @@ import {
   Column,
   PrimaryGeneratedColumn,
   ManyToOne,
-  CreateDateColumn,
+  CreateDateColumn, JoinColumn
 } from 'typeorm';
 import { User } from './user.entity';
 import { Book } from '../../book/entity/book.entity';
@@ -24,8 +24,10 @@ export class UserBook {
   createdAt: Date;
 
   @ManyToOne(() => User, (user) => user.userBooks)
+  @JoinColumn({ name: 'userId' })
   user: User;
 
   @ManyToOne(() => Book, (book) => book)
+  @JoinColumn({ name: 'bookId' })
   book: Book;
 }

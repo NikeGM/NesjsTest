@@ -2,14 +2,14 @@ import { Field, InputType, Int, ObjectType } from '@nestjs/graphql';
 import { Column, PrimaryGeneratedColumn } from 'typeorm';
 
 export enum UserRole {
-  USER = 'USER',
-  MANAGER = 'MANAGER',
-  ADMIN = 'ADMIN',
+  USER = 'user',
+  MANAGER = 'manager',
+  ADMIN = 'admin',
 }
 
 export interface CreateUserDto {
   readonly username: string;
-  readonly passwordHash: string;
+  readonly password: string;
 }
 
 export interface UpdateUserRoleDto {
@@ -52,6 +52,10 @@ export class UserGraphQL {
 export class CreateUserGraphQL {
   @Field()
   username: string;
+
+  @Field()
+  @Column()
+  password: string;
 }
 
 @InputType()

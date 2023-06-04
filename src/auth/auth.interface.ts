@@ -2,7 +2,7 @@ import { InputType, Field, ObjectType } from '@nestjs/graphql';
 
 export interface UserLoginData {
   username: string;
-  passwordHash: string;
+  password: string;
 }
 
 export interface JwtPayload {
@@ -20,7 +20,7 @@ export class UserLoginInputGraphQL {
   username: string;
 
   @Field()
-  passwordHash: string;
+  password: string;
 }
 
 @ObjectType()
@@ -37,5 +37,5 @@ export class UserLoginInput {
   username: string;
 
   @Field()
-  passwordHash: string;
+  password: string;
 }

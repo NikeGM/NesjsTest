@@ -11,20 +11,22 @@ import { Transaction, TransactionAction } from './entity/transaction.entity';
 import { UserRepository } from './user.repository';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { CreateUserDto, UpdateUserRoleDto } from './user.interface';
+import passport from 'passport';
 
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(User)
+    @Inject(UserRepository)
     private userRepository: UserRepository,
     @InjectRepository(Transaction)
     private transactionRepository: Repository<Transaction>,
     @InjectRepository(UserBook)
     private userBookRepository: Repository<UserBook>,
-    @InjectRepository(Book)
+    @Inject(BookService)
     private bookService: BookService,
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: LoggerService
   ) {
+
   }
 
   async buy(userId: number, bookId: number): Promise<boolean> {
@@ -99,7 +101,7 @@ export class UserService {
 
   async findByUsername(username: string): Promise<User> {
     try {
-      const user = await this.userRepository.findUsername(username);
+      const user = await this.userRepository.findByUsername(username);
       if (!user) {
         throw new NotFoundException('User not found');
       }
@@ -112,7 +114,8 @@ export class UserService {
 
   async create(input: CreateUserDto): Promise<User> {
     try {
-      const user = await this.userRepository.create(input);
+      const passwordHash = await bcrypt.hash(input.password, 10)
+      const user = await this.userRepository.create(passwordHash, input);
       if (!user) {
         throw new BadRequestException('Failed to create user');
       }
@@ -151,7 +154,7 @@ export class UserService {
 
   async validateUser(userLoginData: UserLoginData): Promise<User> {
     try {
-      const { username, passwordHash } = userLoginData;
+      const { username, password } = userLoginData;
 
       const user = await this.findByUsername(username);
 
@@ -159,7 +162,7 @@ export class UserService {
         throw new BadRequestException('Invalid credentials');
       }
 
-      const isPasswordMatching = await bcrypt.compare(passwordHash, user.passwordHash);
+      const isPasswordMatching = await bcrypt.compare(password, user.passwordHash);
 
       if (!isPasswordMatching) {
         throw new BadRequestException('Invalid credentials');

@@ -2,7 +2,7 @@ import { config } from 'dotenv';
 
 config();
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app/app.module';
+import { AppModule } from './app.module';
 import { ExpressAdapter } from '@nestjs/platform-express';
 
 // import { FastifyAdapter } from '@nestjs/platform-fastify';

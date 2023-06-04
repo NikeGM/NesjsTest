@@ -38,7 +38,7 @@ export class UserRepository {
     }
   }
 
-  async findUsername(username: string): Promise<User> {
+  async findByUsername(username: string): Promise<User> {
     try {
       const user = await this.userRepository.findOne({ where: { username } });
       if (!user) {
@@ -51,10 +51,11 @@ export class UserRepository {
     }
   }
 
-  async create(userDto: CreateUserDto): Promise<User> {
+  async create(passwordHash, userDto: CreateUserDto): Promise<User> {
     try {
       const user = this.userRepository.create({
-        ...userDto,
+        passwordHash,
+        username: userDto.username,
         balance: 0,
         role: UserRole.USER
       });

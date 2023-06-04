@@ -9,7 +9,6 @@ import {
   Put,
   UseGuards,
   InternalServerErrorException,
-  CanActivate
 } from '@nestjs/common';
 import { CreateBookDto, UpdateBookDto } from './book.interface';
 import { BookService } from './book.service';
@@ -19,6 +18,7 @@ import { Roles } from '../role/role.decorator';
 import { UserRole } from '../user/user.interface';
 import { Book } from './entity/book.entity';
 import { Logger } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/auth.guard';
 
 @Controller('books')
 export class BookController {
@@ -53,7 +53,7 @@ export class BookController {
   }
 
   @Post()
-  @UseGuards(AuthGuard(), RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
   async create(@Body() book: CreateBookDto): Promise<Book> {
     try {
@@ -65,7 +65,7 @@ export class BookController {
   }
 
   @Put(':bookId')
-  @UseGuards(AuthGuard(), RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
   async update(@Param('bookId') bookId: number, @Body() book: UpdateBookDto): Promise<Book> {
     try {
@@ -77,7 +77,7 @@ export class BookController {
   }
 
   @Delete(':bookId')
-  @UseGuards(AuthGuard(), RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
   async delete(@Param('bookId') bookId: number): Promise<void> {
     try {

@@ -19,6 +19,7 @@ import { Roles } from '../role/role.decorator';
 import { UserAccessGuard } from './user-access.guard';
 import { User } from './entity/user.entity';
 import { Logger } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/auth.guard';
 
 @Controller('users')
 export class UserController {
@@ -29,7 +30,7 @@ export class UserController {
   }
 
   @Get()
-  @UseGuards(AuthGuard(), RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
   async findAll(): Promise<UserDto[]> {
     try {
@@ -43,7 +44,7 @@ export class UserController {
   }
 
   @Get(':userId')
-  @UseGuards(AuthGuard(), UserAccessGuard)
+  @UseGuards(JwtAuthGuard, UserAccessGuard)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
   async findOne(@Param('userId') userId: number): Promise<UserDto> {
     try {
@@ -73,7 +74,7 @@ export class UserController {
   }
 
   @Put(':userId')
-  @UseGuards(AuthGuard(), RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   async update(@Param('userId') userId: number, @Body() input: UpdateUserRoleDto): Promise<UserDto> {
     try {
@@ -91,7 +92,7 @@ export class UserController {
   }
 
   @Delete(':userId')
-  @UseGuards(AuthGuard(), RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   async delete(@Param('userId') userId: number): Promise<boolean> {
     try {
@@ -109,7 +110,7 @@ export class UserController {
   }
 
   @Post('/buy')
-  @UseGuards(AuthGuard())
+  @UseGuards(JwtAuthGuard)
   async buy(@Req() req, @Body('bookId') bookId: number) {
     try {
       const result = await this.userService.buy(req.user.userId, bookId);

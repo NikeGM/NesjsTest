@@ -32,7 +32,13 @@ export class CreateUserBooksTable1685691552998 implements MigrationInterface {
             type: 'timestamp',
             default: 'now()'
           }
-        ]
+        ],
+        uniques: [
+          {
+            name: 'unique_user_book',
+            columnNames: ['userId', 'bookId'],
+          },
+        ],
       }),
       true
     );

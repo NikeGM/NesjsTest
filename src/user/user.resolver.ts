@@ -1,12 +1,17 @@
 import { Resolver, Query, Args, Mutation, Int, Context } from '@nestjs/graphql';
-import { CreateUserDto, UpdateUserRoleDto, UserGraphQL, UserRole } from './user.interface';
+import {
+  CreateUserGraphQL,
+  UpdateUserRoleGraphQL,
+  UserGraphQL,
+  UserRole
+} from './user.interface';
 import { UseGuards, NotFoundException, InternalServerErrorException, CanActivate } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
-import { RolesGuard } from '../role/role.guard';
+import { RolesGuardGraphQL } from '../role/role.guard';
 import { Roles } from '../role/role.decorator';
 import { UserAccessGraphQlGuard } from './user-access.guard';
 import { UserService } from './user.service';
 import { User } from './entity/user.entity';
+import { AuthGuardGraphQL } from '../auth/auth.guard';
 
 @Resolver(of => UserGraphQL)
 export class UserResolver {
@@ -14,9 +19,9 @@ export class UserResolver {
   }
 
   @Query(returns => [UserGraphQL])
-  @UseGuards(AuthGuard(), RolesGuard)
+  @UseGuards(AuthGuardGraphQL, RolesGuardGraphQL)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  async users(): Promise<User[]> {
+  async getUsers(): Promise<User[]> {
     try {
       return await this.userService.findAll();
     } catch (error) {
@@ -25,8 +30,8 @@ export class UserResolver {
   }
 
   @Query(returns => UserGraphQL)
-  @UseGuards(AuthGuard(), UserAccessGraphQlGuard)
-  async user(@Args('userId', { type: () => Int }) userId: number): Promise<User> {
+  @UseGuards(AuthGuardGraphQL, UserAccessGraphQlGuard)
+  async getUser(@Args('userId', { type: () => Int }) userId: number): Promise<User> {
     try {
       const user = await this.userService.findById(userId);
       if (!user) {
@@ -39,27 +44,33 @@ export class UserResolver {
   }
 
   @Mutation(returns => UserGraphQL)
-  async createUser(@Args('createUserInput') createUserInput: CreateUserDto): Promise<User> {
+  async createUser(@Args('createUserInput') createUserInput: CreateUserGraphQL): Promise<User> {
     try {
-      return await this.userService.create(createUserInput);
+      return await this.userService.create({
+        username: createUserInput.username,
+        password: createUserInput.password
+      });
     } catch (error) {
       throw new InternalServerErrorException('Failed to create user');
     }
   }
 
   @Mutation(returns => UserGraphQL)
-  @UseGuards(AuthGuard(), RolesGuard)
+  @UseGuards(AuthGuardGraphQL, RolesGuardGraphQL)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  async updateUser(@Args('updateUserInput') updateUserInput: UpdateUserRoleDto): Promise<User> {
+  async updateUserRole(@Args('updateUserRoleInput') updateUserRoleInput: UpdateUserRoleGraphQL): Promise<User> {
     try {
-      return await this.userService.updateRole(updateUserInput);
+      return await this.userService.updateRole({
+        role: updateUserRoleInput.role,
+        userId: updateUserRoleInput.userId
+      });
     } catch (error) {
-      throw new InternalServerErrorException(`Failed to update user with id: ${updateUserInput.userId}`);
+      throw new InternalServerErrorException(`Failed to update user with id: ${updateUserRoleInput.userId}`);
     }
   }
 
   @Mutation(returns => Int)
-  @UseGuards(AuthGuard(), RolesGuard)
+  @UseGuards(AuthGuardGraphQL, RolesGuardGraphQL)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
   async deleteUser(@Args('userId', { type: () => Int }) userId: number): Promise<boolean> {
     try {
@@ -70,8 +81,9 @@ export class UserResolver {
   }
 
   @Mutation(returns => Boolean)
-  @UseGuards(AuthGuard())
-  async buy(@Context('user') user: UserGraphQL, @Args('bookId') bookId: number): Promise<boolean> {
+  @UseGuards(AuthGuardGraphQL)
+  async buyBook(@Context() context, @Args('bookId') bookId: number): Promise<boolean> {
+    const user = context.req.user;
     try {
       return await this.userService.buy(user.userId, bookId);
     } catch (error) {
