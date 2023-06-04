@@ -1,4 +1,4 @@
-# My Project
+# NestJS BookStore Sample
 
 This project serves as an example of a simple service - a book store - built with NestJS and TypeORM.
 
