@@ -1,0 +1,85 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type UserGraphQL {
+  userId: Int!
+  balance: Int!
+  username: String!
+  role: String!
+  passwordHash: String!
+}
+
+type BookGraphQL {
+  bookId: ID!
+  title: String!
+  author: String!
+  description: String!
+  publicationDate: DateTime!
+  price: Float!
+  category: String!
+  coverImageURL: String!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type LoginResultGraphQL {
+  accessToken: String!
+  expiresIn: Float!
+}
+
+type Query {
+  getBooks: [BookGraphQL!]!
+  getBook(bookId: Float!): BookGraphQL
+  getUsers: [UserGraphQL!]!
+  getUser(userId: Int!): UserGraphQL!
+}
+
+type Mutation {
+  createBook(input: CreateBookGraphQL!): BookGraphQL!
+  updateBook(bookId: Float!, input: UpdateBookGraphQL!): BookGraphQL!
+  deleteBook(bookId: Float!): Boolean!
+  login(input: UserLoginInput!): LoginResultGraphQL!
+  createUser(createUserInput: CreateUserGraphQL!): UserGraphQL!
+  updateUserRole(updateUserRoleInput: UpdateUserRoleGraphQL!): UserGraphQL!
+  deleteUser(userId: Int!): Int!
+  buyBook(bookId: Float!): Boolean!
+}
+
+input CreateBookGraphQL {
+  title: String!
+  author: String!
+  description: String!
+  publicationDate: DateTime!
+  price: Float!
+  category: String!
+  coverImageURL: String!
+}
+
+input UpdateBookGraphQL {
+  title: String
+  author: String
+  description: String
+  publicationDate: DateTime
+  price: Float
+  category: String
+  coverImageURL: String
+}
+
+input UserLoginInput {
+  username: String!
+  password: String!
+}
+
+input CreateUserGraphQL {
+  username: String!
+  password: String!
+}
+
+input UpdateUserRoleGraphQL {
+  userId: Int
+  role: String
+}
