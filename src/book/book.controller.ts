@@ -1,4 +1,16 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Post, Put, UseGuards, InternalServerErrorException } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  NotFoundException,
+  Param,
+  Post,
+  Put,
+  UseGuards,
+  InternalServerErrorException,
+  CanActivate
+} from '@nestjs/common';
 import { CreateBookDto, UpdateBookDto } from './book.interface';
 import { BookService } from './book.service';
 import { AuthGuard } from '@nestjs/passport';

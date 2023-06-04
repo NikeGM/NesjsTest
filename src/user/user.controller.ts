@@ -9,10 +9,10 @@ import {
   UseGuards,
   Req,
   NotFoundException,
-  BadRequestException
+  BadRequestException, CanActivate
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto, UpdateUserDto, UserDto, UserRole } from './user.interface';
+import { CreateUserDto, UpdateUserRoleDto, UserDto, UserRole } from './user.interface';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../role/role.guard';
 import { Roles } from '../role/role.decorator';
@@ -75,18 +75,18 @@ export class UserController {
   @Put(':userId')
   @UseGuards(AuthGuard(), RolesGuard)
   @Roles(UserRole.ADMIN)
-  async update(@Param('userId') userId: number, @Body() input: UpdateUserDto): Promise<UserDto> {
+  async update(@Param('userId') userId: number, @Body() input: UpdateUserRoleDto): Promise<UserDto> {
     try {
-      const user = await this.userService.update(userId, input);
+      const user = await this.userService.updateRole(input);
       if (!user) {
-        this.logger.warn(`Failed to update user with ID: ${userId}`);
+        this.logger.warn(`Failed to update user role with ID: ${userId}`);
         throw new NotFoundException(`User with ID: ${userId} not found`);
       }
-      this.logger.log(`Successfully updated user with ID: ${userId}`);
+      this.logger.log(`Successfully updated user role with ID: ${userId}`);
       return this.userToDtoFormat(user);
     } catch (error) {
-      this.logger.error(`Failed to update user with ID: ${userId}. Error: ${error.message}`);
-      throw new BadRequestException(`Failed to update user with ID: ${userId}. Error: ${error.message}`);
+      this.logger.error(`Failed to update user role with ID: ${userId}. Error: ${error.message}`);
+      throw new BadRequestException(`Failed to update user role with ID: ${userId}. Error: ${error.message}`);
     }
   }
 

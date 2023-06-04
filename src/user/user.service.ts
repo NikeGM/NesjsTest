@@ -1,7 +1,6 @@
 import { BadRequestException, NotFoundException, Injectable, Inject, LoggerService } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CreateUserDto, UpdateUserDto } from './user.interface';
 import bcrypt from 'bcrypt';
 import { UserLoginData } from '../auth/auth.interface';
 import { BookService } from '../book/book.service';
@@ -11,6 +10,7 @@ import { UserBook } from './entity/user-book.entity';
 import { Transaction, TransactionAction } from './entity/transaction.entity';
 import { UserRepository } from './user.repository';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { CreateUserDto, UpdateUserRoleDto } from './user.interface';
 
 @Injectable()
 export class UserService {
@@ -123,9 +123,9 @@ export class UserService {
     }
   }
 
-  async update(userId: number, input: UpdateUserDto): Promise<User> {
+  async updateRole(input: UpdateUserRoleDto): Promise<User> {
     try {
-      const user = await this.userRepository.update(userId, input);
+      const user = await this.userRepository.updateRole(input);
       if (!user) {
         throw new BadRequestException('Failed to update user');
       }

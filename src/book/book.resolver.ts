@@ -1,7 +1,7 @@
 import { Resolver, Query, Args, Mutation } from '@nestjs/graphql';
 import { BookService } from './book.service';
 import { BookGraphQL, CreateBookDto, CreateBookGraphQL, UpdateBookDto, UpdateBookGraphQL } from './book.interface';
-import { UseGuards, NotFoundException, InternalServerErrorException } from '@nestjs/common';
+import { UseGuards, NotFoundException, InternalServerErrorException, CanActivate } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../role/role.guard';
 import { Roles } from '../role/role.decorator';

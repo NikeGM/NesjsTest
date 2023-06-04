@@ -1,7 +1,7 @@
-import { Injectable, Logger, InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { Repository, EntityManager } from 'typeorm';
-import { InjectRepository, InjectEntityManager } from '@nestjs/typeorm';
-import { CreateUserDto, UpdateUserDto } from './user.interface';
+import { Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
+import { EntityManager, Repository } from 'typeorm';
+import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
+import { CreateUserDto, UpdateUserRoleDto, UserRole } from './user.interface';
 import { User } from './entity/user.entity';
 
 @Injectable()
@@ -53,7 +53,11 @@ export class UserRepository {
 
   async create(userDto: CreateUserDto): Promise<User> {
     try {
-      const user = this.userRepository.create(userDto);
+      const user = this.userRepository.create({
+        ...userDto,
+        balance: 0,
+        role: UserRole.USER
+      });
       return await this.userRepository.save(user);
     } catch (error) {
       this.logger.error('Failed to create user', error.stack);
@@ -61,7 +65,8 @@ export class UserRepository {
     }
   }
 
-  async update(userId: number, userDto: UpdateUserDto): Promise<User> {
+  async updateRole(userDto: UpdateUserRoleDto): Promise<User> {
+    const { userId } = userDto;
     try {
       const user = await this.userRepository.findOne({ where: { userId } });
       if (!user) {
@@ -70,8 +75,8 @@ export class UserRepository {
       const updatedUser = this.userRepository.merge(user, userDto);
       return await this.userRepository.save(updatedUser);
     } catch (error) {
-      this.logger.error(`Failed to update user with id: ${userId}`, error.stack);
-      throw new InternalServerErrorException(`Failed to update user with id: ${userId}`);
+      this.logger.error(`Failed to update user role with id: ${userId}`, error.stack);
+      throw new InternalServerErrorException(`Failed to update user role with id: ${userId}`);
     }
   }
 

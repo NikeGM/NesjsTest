@@ -1,6 +1,6 @@
 import { Resolver, Query, Args, Mutation, Int, Context } from '@nestjs/graphql';
-import { CreateUserDto, UpdateUserDto, UserGraphQL, UserRole } from './user.interface';
-import { UseGuards, NotFoundException, InternalServerErrorException } from '@nestjs/common';
+import { CreateUserDto, UpdateUserRoleDto, UserGraphQL, UserRole } from './user.interface';
+import { UseGuards, NotFoundException, InternalServerErrorException, CanActivate } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../role/role.guard';
 import { Roles } from '../role/role.decorator';
@@ -50,9 +50,9 @@ export class UserResolver {
   @Mutation(returns => UserGraphQL)
   @UseGuards(AuthGuard(), RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  async updateUser(@Args('updateUserInput') updateUserInput: UpdateUserDto): Promise<User> {
+  async updateUser(@Args('updateUserInput') updateUserInput: UpdateUserRoleDto): Promise<User> {
     try {
-      return await this.userService.update(updateUserInput.userId, updateUserInput);
+      return await this.userService.updateRole(updateUserInput);
     } catch (error) {
       throw new InternalServerErrorException(`Failed to update user with id: ${updateUserInput.userId}`);
     }
