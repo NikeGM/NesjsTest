@@ -5,6 +5,7 @@ import { CreateBookDto, UpdateBookDto } from './book.interface';
 import { Book } from './entity/book.entity';
 import { Logger } from '@nestjs/common';
 
+// BookRepository is a service class that provides methods to interact with the book data in the database
 @Injectable()
 export class BookRepository {
   private readonly logger = new Logger(BookRepository.name);
@@ -15,6 +16,7 @@ export class BookRepository {
   ) {
   }
 
+  // Fetch all books from the database
   async findAll(): Promise<Book[]> {
     try {
       return this.bookRepository.find();
@@ -24,6 +26,7 @@ export class BookRepository {
     }
   }
 
+  // Fetch a book from the database by id
   async findById(bookId: number): Promise<Book> {
     try {
       const book = await this.bookRepository.findOne({ where: { bookId } });
@@ -37,6 +40,7 @@ export class BookRepository {
     }
   }
 
+  // Create a new book in the database
   async create(bookDto: CreateBookDto): Promise<Book> {
     try {
       const book = this.bookRepository.create(bookDto);
@@ -47,6 +51,7 @@ export class BookRepository {
     }
   }
 
+  // Update a book in the database by id
   async update(bookId: number, bookDto: UpdateBookDto): Promise<Book> {
     try {
       const book = await this.bookRepository.findOne({ where: { bookId } });
@@ -61,6 +66,7 @@ export class BookRepository {
     }
   }
 
+  // Delete a book from the database by id
   async delete(bookId: number): Promise<boolean> {
     try {
       const deleteResult = await this.bookRepository.delete(bookId);

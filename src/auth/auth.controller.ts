@@ -3,6 +3,7 @@ import { AuthService } from './auth.service';
 import { UserLoginData } from './auth.interface';
 import { Logger } from '@nestjs/common';
 
+// AuthController is a controller that handles HTTP requests related to user authentication
 @Controller('auth')
 export class AuthController {
   private readonly logger = new Logger(AuthController.name);
@@ -10,6 +11,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {
   }
 
+  // login() method handles POST requests to /auth/login to authenticate a user and return a JWT
   @Post('login')
   async login(@Body() userLoginData: UserLoginData) {
     try {

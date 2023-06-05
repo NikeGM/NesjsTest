@@ -13,11 +13,13 @@ import { UserService } from './user.service';
 import { User } from './entity/user.entity';
 import { AuthGuardGraphQL } from '../auth/auth.guard';
 
+// UserResolver handles GraphQL requests for User.
 @Resolver(of => UserGraphQL)
 export class UserResolver {
   constructor(private readonly userService: UserService) {
   }
 
+  // Fetches all users. Accessible by admins and managers.
   @Query(returns => [UserGraphQL])
   @UseGuards(AuthGuardGraphQL, RolesGuardGraphQL)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
@@ -29,6 +31,7 @@ export class UserResolver {
     }
   }
 
+  // Fetches a specific user. Accessible by the user themselves.
   @Query(returns => UserGraphQL)
   @UseGuards(AuthGuardGraphQL, UserAccessGraphQlGuard)
   async getUser(@Args('userId', { type: () => Int }) userId: number): Promise<User> {
@@ -43,6 +46,7 @@ export class UserResolver {
     }
   }
 
+  // Creates a new user. Accessible by anyone.
   @Mutation(returns => UserGraphQL)
   async createUser(@Args('createUserInput') createUserInput: CreateUserGraphQL): Promise<User> {
     try {
@@ -55,6 +59,7 @@ export class UserResolver {
     }
   }
 
+  // Updates a user's role. Accessible by admins and managers.
   @Mutation(returns => UserGraphQL)
   @UseGuards(AuthGuardGraphQL, RolesGuardGraphQL)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
@@ -69,6 +74,7 @@ export class UserResolver {
     }
   }
 
+  // Deletes a user. Accessible by admins and managers.
   @Mutation(returns => Int)
   @UseGuards(AuthGuardGraphQL, RolesGuardGraphQL)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
@@ -80,6 +86,7 @@ export class UserResolver {
     }
   }
 
+  // Allows a user to buy a book. Accessible by the user.
   @Mutation(returns => Boolean)
   @UseGuards(AuthGuardGraphQL)
   async buyBook(@Context() context, @Args('bookId') bookId: number): Promise<boolean> {

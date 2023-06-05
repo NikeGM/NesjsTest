@@ -1,15 +1,15 @@
 import { Resolver, Query, Args, Mutation } from '@nestjs/graphql';
 import { BookService } from './book.service';
-import { BookGraphQL, CreateBookDto, CreateBookGraphQL, UpdateBookDto, UpdateBookGraphQL } from './book.interface';
+import { BookGraphQL, CreateBookGraphQL, UpdateBookGraphQL } from './book.interface';
 import { UseGuards, NotFoundException, InternalServerErrorException, CanActivate } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
-import { RolesGuard, RolesGuardGraphQL } from '../role/role.guard';
+import { RolesGuardGraphQL } from '../role/role.guard';
 import { Roles } from '../role/role.decorator';
 import { UserRole } from '../user/user.interface';
 import { Book } from './entity/book.entity';
 import { Logger } from '@nestjs/common';
 import { AuthGuardGraphQL } from '../auth/auth.guard';
 
+// BookResolver handles GraphQL requests for Book.
 @Resolver(of => BookGraphQL)
 export class BookResolver {
   private readonly logger = new Logger(BookResolver.name);
@@ -17,6 +17,7 @@ export class BookResolver {
   constructor(private readonly bookService: BookService) {
   }
 
+  // Get all books
   @Query(returns => [BookGraphQL])
   async getBooks(): Promise<Book[]> {
     try {
@@ -27,6 +28,7 @@ export class BookResolver {
     }
   }
 
+  // Get one book by id
   @Query(returns => BookGraphQL, { nullable: true })
   async getBook(@Args('bookId') bookId: number): Promise<Book> {
     try {
@@ -41,6 +43,7 @@ export class BookResolver {
     }
   }
 
+  // Create a new book
   @Mutation(returns => BookGraphQL)
   @UseGuards(AuthGuardGraphQL, RolesGuardGraphQL)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
@@ -53,6 +56,7 @@ export class BookResolver {
     }
   }
 
+  // Update a book by id
   @Mutation(returns => BookGraphQL)
   @UseGuards(AuthGuardGraphQL, RolesGuardGraphQL)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
@@ -69,6 +73,7 @@ export class BookResolver {
     }
   }
 
+  // Delete a book by id
   @Mutation(returns => Boolean)
   @UseGuards(AuthGuardGraphQL, RolesGuardGraphQL)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)

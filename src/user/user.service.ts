@@ -13,6 +13,7 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { CreateUserDto, UpdateUserRoleDto } from './user.interface';
 import passport from 'passport';
 
+// UserService class provides user related services such as buying a book, creating a user, etc.
 @Injectable()
 export class UserService {
   constructor(
@@ -29,6 +30,7 @@ export class UserService {
 
   }
 
+  // Buys a book for the user by reducing user balance and creating a transaction
   async buy(userId: number, bookId: number): Promise<boolean> {
     try {
       const user = await this.findById(userId);
@@ -73,6 +75,7 @@ export class UserService {
     }
   }
 
+  // Fetches all users from the repository
   async findAll(): Promise<User[]> {
     try {
       const users = await this.userRepository.findAll();
@@ -86,6 +89,7 @@ export class UserService {
     }
   }
 
+  // Fetches a user by id from the repository
   async findById(userId: number): Promise<User> {
     try {
       const user = await this.userRepository.findById(userId);
@@ -99,6 +103,7 @@ export class UserService {
     }
   }
 
+  // Fetches a user by username from the repository
   async findByUsername(username: string): Promise<User> {
     try {
       const user = await this.userRepository.findByUsername(username);
@@ -112,6 +117,7 @@ export class UserService {
     }
   }
 
+  // Creates a new user with the given input
   async create(input: CreateUserDto): Promise<User> {
     try {
       const passwordHash = await bcrypt.hash(input.password, 10)
@@ -126,6 +132,7 @@ export class UserService {
     }
   }
 
+  // Updates the role of a user with the given input
   async updateRole(input: UpdateUserRoleDto): Promise<User> {
     try {
       const user = await this.userRepository.updateRole(input);
@@ -139,6 +146,7 @@ export class UserService {
     }
   }
 
+  // Deletes a user by userId
   async delete(userId: number): Promise<boolean> {
     try {
       const result = await this.userRepository.delete(userId);
@@ -152,6 +160,7 @@ export class UserService {
     }
   }
 
+  // Validates a user login data and returns the user if successful
   async validateUser(userLoginData: UserLoginData): Promise<User> {
     try {
       const { username, password } = userLoginData;

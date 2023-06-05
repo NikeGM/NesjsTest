@@ -1,3 +1,4 @@
+// DTO for creating a book
 export interface CreateBookDto {
   readonly title: string;
   readonly author: string;
@@ -8,6 +9,7 @@ export interface CreateBookDto {
   readonly coverImageURL: string;
 }
 
+// DTO for updating a book
 export interface UpdateBookDto {
   readonly title?: string;
   readonly author?: string;
@@ -20,6 +22,7 @@ export interface UpdateBookDto {
 
 import { Field, Float, ID, InputType, ObjectType } from '@nestjs/graphql';
 
+// GraphQL object type for a book
 @ObjectType()
 export class BookGraphQL {
   @Field(type => ID)
@@ -47,6 +50,7 @@ export class BookGraphQL {
   coverImageURL: string;
 }
 
+// GraphQL input type for creating a book
 @InputType()
 export class CreateBookGraphQL {
   @Field()
@@ -71,6 +75,7 @@ export class CreateBookGraphQL {
   coverImageURL: string;
 }
 
+// GraphQL input type for updating a book
 @InputType()
 export class UpdateBookGraphQL {
   @Field({ nullable: true })

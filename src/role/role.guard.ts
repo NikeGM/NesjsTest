@@ -2,6 +2,7 @@ import { Injectable, CanActivate, ExecutionContext, Logger, UnauthorizedExceptio
 import { Reflector } from '@nestjs/core';
 import { GqlExecutionContext } from '@nestjs/graphql';
 
+// Guard to check user roles for REST API
 @Injectable()
 export class RolesGuard implements CanActivate {
   private readonly logger = new Logger(RolesGuard.name);
@@ -9,6 +10,7 @@ export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {
   }
 
+  // Checks if user has required role for REST API
   canActivate(context: ExecutionContext): boolean {
     try {
       const roles = this.reflector.get<string[]>('roles', context.getHandler());
@@ -32,6 +34,7 @@ export class RolesGuard implements CanActivate {
   }
 }
 
+// Guard to check user roles for GraphQL API
 @Injectable()
 export class RolesGuardGraphQL implements CanActivate {
   private readonly logger = new Logger(RolesGuard.name);
@@ -39,6 +42,7 @@ export class RolesGuardGraphQL implements CanActivate {
   constructor(private reflector: Reflector) {
   }
 
+  // Checks if user has required role for GraphQL API
   canActivate(context: ExecutionContext): boolean {
     try {
       const roles = this.reflector.get<string[]>('roles', context.getHandler());

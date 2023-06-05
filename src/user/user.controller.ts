@@ -21,6 +21,7 @@ import { User } from './entity/user.entity';
 import { Logger } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/auth.guard';
 
+// UserController manages all user-related endpoints.
 @Controller('users')
 export class UserController {
   constructor(
@@ -29,6 +30,7 @@ export class UserController {
   ) {
   }
 
+  // Fetches all users. Accessible by admins and managers.
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
@@ -43,6 +45,7 @@ export class UserController {
     }
   }
 
+  // Fetches a specific user. Accessible by the user themselves.
   @Get(':userId')
   @UseGuards(JwtAuthGuard, UserAccessGuard)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
@@ -61,6 +64,7 @@ export class UserController {
     }
   }
 
+  // Creates a new user. Accessible by anyone.
   @Post()
   async create(@Body() input: CreateUserDto): Promise<UserDto> {
     try {
@@ -73,6 +77,7 @@ export class UserController {
     }
   }
 
+  // Updates a user's role. Accessible by admins and managers.
   @Put(':userId')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
@@ -91,6 +96,7 @@ export class UserController {
     }
   }
 
+  // Deletes a user. Accessible by admins and managers.
   @Delete(':userId')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
@@ -109,6 +115,7 @@ export class UserController {
     }
   }
 
+  // Allows a user to buy a book. Accessible by the user.
   @Post('/buy')
   @UseGuards(JwtAuthGuard)
   async buy(@Req() req, @Body('bookId') bookId: number) {
@@ -126,6 +133,7 @@ export class UserController {
     }
   }
 
+  // Converts a User entity to a UserDto object.
   private userToDtoFormat(user: User): UserDto {
     return {
       balance: user.balance,

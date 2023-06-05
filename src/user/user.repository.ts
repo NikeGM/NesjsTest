@@ -4,6 +4,7 @@ import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto, UpdateUserRoleDto, UserRole } from './user.interface';
 import { User } from './entity/user.entity';
 
+// UserService class to manage user related operations
 @Injectable()
 export class UserRepository {
   private readonly logger = new Logger(UserRepository.name);
@@ -16,6 +17,7 @@ export class UserRepository {
   ) {
   }
 
+  // Get all users from the database
   async findAll(): Promise<User[]> {
     try {
       return await this.userRepository.find();
@@ -25,6 +27,7 @@ export class UserRepository {
     }
   }
 
+  // Find a user by their ID
   async findById(userId: number): Promise<User> {
     try {
       const user = await this.userRepository.findOne({ where: { userId } });
@@ -38,6 +41,7 @@ export class UserRepository {
     }
   }
 
+  // Find a user by their username
   async findByUsername(username: string): Promise<User> {
     try {
       const user = await this.userRepository.findOne({ where: { username } });
@@ -51,6 +55,7 @@ export class UserRepository {
     }
   }
 
+  // Create a new user
   async create(passwordHash, userDto: CreateUserDto): Promise<User> {
     try {
       const user = this.userRepository.create({
@@ -66,6 +71,7 @@ export class UserRepository {
     }
   }
 
+  // Update the role of a user
   async updateRole(userDto: UpdateUserRoleDto): Promise<User> {
     const { userId } = userDto;
     try {
@@ -81,6 +87,7 @@ export class UserRepository {
     }
   }
 
+  // Delete a user
   async delete(userId: number): Promise<boolean> {
     try {
       const result = await this.userRepository.delete(userId);
@@ -94,6 +101,7 @@ export class UserRepository {
     }
   }
 
+  // Execute a transaction
   async executeInTransaction(execution: (manager: EntityManager) => Promise<any>): Promise<any> {
     try {
       return await this.entityManager.transaction(execution);

@@ -1,23 +1,26 @@
 import { Field, InputType, Int, ObjectType } from '@nestjs/graphql';
 import { Column, PrimaryGeneratedColumn } from 'typeorm';
 
+// Defines the possible roles a user can have.
 export enum UserRole {
   USER = 'user',
   MANAGER = 'manager',
   ADMIN = 'admin',
 }
 
+// Data Transfer Object (DTO) for creating a new user.
 export interface CreateUserDto {
   readonly username: string;
   readonly password: string;
 }
 
+// DTO for updating a user's role.
 export interface UpdateUserRoleDto {
   userId: number;
   readonly role?: UserRole;
 }
 
-
+// DTO for retrieving user data.
 export interface UserDto {
   readonly userId: number;
   readonly balance?: number;
@@ -25,6 +28,7 @@ export interface UserDto {
   readonly role?: UserRole;
 }
 
+// GraphQL object type for a user.
 @ObjectType()
 export class UserGraphQL {
   @Field(type => Int)
@@ -48,6 +52,7 @@ export class UserGraphQL {
   passwordHash: string;
 }
 
+// GraphQL input type for creating a user.
 @InputType()
 export class CreateUserGraphQL {
   @Field()
@@ -58,6 +63,7 @@ export class CreateUserGraphQL {
   password: string;
 }
 
+// GraphQL input type for updating a user's role.
 @InputType()
 export class UpdateUserRoleGraphQL {
   @Field(type => Int, { nullable: true })

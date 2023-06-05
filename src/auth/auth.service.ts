@@ -4,6 +4,7 @@ import { JwtPayload, UserLoginData } from './auth.interface';
 import { UserService } from '../user/user.service';
 import { Logger } from '@nestjs/common';
 
+// AuthService handles user authentication, including JWT creation
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
@@ -14,6 +15,7 @@ export class AuthService {
   ) {
   }
 
+  // login function validates user credentials and issues a JWT
   async login(userLoginData: UserLoginData) {
     try {
       const user = await this.usersService.validateUser(userLoginData);
@@ -26,7 +28,7 @@ export class AuthService {
       const accessToken = this.jwtService.sign(payload);
 
       return {
-        expiresIn: 3600,
+        expiresIn: process.env.TOKEN_EXPIRATION_TIME,
         accessToken
       };
     } catch (error) {

@@ -20,6 +20,7 @@ import { Book } from './entity/book.entity';
 import { Logger } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/auth.guard';
 
+// Controller for books
 @Controller('books')
 export class BookController {
   private readonly logger = new Logger(BookController.name);
@@ -27,6 +28,7 @@ export class BookController {
   constructor(private readonly bookService: BookService) {
   }
 
+  // Get all books
   @Get()
   async findAll(): Promise<Book[]> {
     try {
@@ -37,6 +39,7 @@ export class BookController {
     }
   }
 
+  // Get one book by id
   @Get(':bookId')
   async findOne(@Param('bookId') bookId: number): Promise<Book> {
     try {
@@ -52,6 +55,7 @@ export class BookController {
     }
   }
 
+  // Create a new book
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
@@ -64,6 +68,7 @@ export class BookController {
     }
   }
 
+  // Update a book by id
   @Put(':bookId')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
@@ -76,6 +81,7 @@ export class BookController {
     }
   }
 
+  // Delete a book by id
   @Delete(':bookId')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)

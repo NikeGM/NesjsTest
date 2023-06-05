@@ -1,15 +1,24 @@
-import { Injectable, CanActivate, ExecutionContext, Inject, ForbiddenException, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  Inject,
+  ForbiddenException,
+  UnauthorizedException
+} from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { UserRole } from './user.interface';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
+// Guard for HTTP API
 @Injectable()
 export class UserAccessGuard implements CanActivate {
   constructor(@Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger) {
   }
 
+  // Checks user permissions
   canActivate(
     context: ExecutionContext
   ): boolean | Promise<boolean> | Observable<boolean> {
@@ -33,11 +42,13 @@ export class UserAccessGuard implements CanActivate {
   }
 }
 
+// Guard for GraphQL API
 @Injectable()
 export class UserAccessGraphQlGuard implements CanActivate {
   constructor(@Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger) {
   }
 
+  // Checks user permissions for GraphQL API
   canActivate(
     context: ExecutionContext
   ): boolean | Promise<boolean> | Observable<boolean> {
